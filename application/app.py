@@ -19,8 +19,8 @@ if is_prod:
   app.debug = False
   username = os.environ.get('DATABASE_USERNAME', '')
   password = os.environ.get('DATABASE_PASSWORD', '')
-  app.config['MONGO_URI'] = f'mongodb+srv://phil:{password}@cluster0-acs53.mongodb.net/test?retryWrites=true&w=majority'
-  app.config['MONGO_DBNAME'] = db_name
+  app.config['MONGO_URI'] = f'mongodb+srv://{username}:{password}@cluster0-laoqs.mongodb.net/test?retryWrites=true&w=majority'
+  app.config['MONGO_DBNAME'] = 'test'
 # else if you are running the app locally.
 else:
   app.debug = True
