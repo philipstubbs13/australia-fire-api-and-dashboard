@@ -9,51 +9,79 @@ from flask_pymongo import PyMongo
 
 app = Flask(__name__)
 
+# Constants
 is_prod = os.environ.get('DATABASE_USERNAME', '')
+api_base_url = '/api/v1.0/'
+db_name = 'australia_fire_db'
 
+# If this app is on production/deployed to heroku.
 if is_prod:
   app.debug = False
   username = os.environ.get('DATABASE_USERNAME', '')
   password = os.environ.get('DATABASE_PASSWORD', '')
-  app.config['MONGO_URI'] = f'mongodb+srv://{username}:{password}@cluster0-laoqs.mongodb.net/test?retryWrites=true&w=majority'
-  app.config['MONGO_DBNAME'] = 'australia-fire-db'
+  app.config['MONGO_URI'] = f'mongodb+srv://{username}:{password}@cluster0-acs53.mongodb.net/test?retryWrites=true&w=majority'
+  app.config['MONGO_DBNAME'] = db_name
+# else if you are running the app locally.
 else:
   app.debug = True
-  app.config['MONGO_URI'] = 'mongodb://localhost:27017/australia-fire-db'
+  app.config['MONGO_URI'] = f'mongodb://localhost:27017/{db_name}'
 
 mongo = PyMongo(app)
 
+# Route for api docs page.
 @app.route("/")
-def home():
-  return
-  # return render_template("index.html")
-
-@app.route("/charts")
-def charts():
-  return
-  # return render_template("charts.html")
-
-@app.route("/map")
-def map():
-  return
-  # return render_template("map.html")
-
-@app.route("/data")
-def data():
-  return
-  # return render_template("data.html")
-
-@app.route("/api/v1.0/docs")
+@app.route(f"{api_base_url}docs")
 def api_docs():
     return render_template("api_documentation.html")
 
-# Route that will trigger the scrape function
-@app.route("/scrape")
-def scrape():
+# GET request - all the MODIS fires.
+@app.route(f"{api_base_url}fires_modis", methods=['GET'])
+def fires_modis():
 
-  # Redirect back to home page
-  return redirect("/")
+  data = mongo.db.fires_modis.find()
 
+  output = []
+
+  for fire in data:
+    output.append({
+      'id': str(fire['_id']),
+      'acq_date': fire['acq_date'],
+      'acq_time': fire['acq_time'],
+      'brightness' : fire['brightness'],
+      'daynight' : fire['daynight'],
+      'frp': fire['frp'],
+      'instrument': fire['instrument'],
+      'latitude': fire['latitude'],
+      'longitude': fire['longitude'],
+      'satellite': fire['satellite'],
+      'bright_t31': fire['bright_t31']
+    })
+
+  return jsonify({'result' : output})
+
+# GET request - all the VIIRS fires.
+@app.route(f"{api_base_url}fires_viirs", methods=['GET'])
+def fires_viirs():
+
+  data = mongo.db.fires_viirs.find()
+
+  output = []
+
+  for fire in data:
+    output.append({
+      'id': str(fire['_id']),
+      'acq_date': fire['acq_date'],
+      'acq_time': fire['acq_time'],
+      'bright_ti4' : fire['bright_ti4'],
+      'bright_ti5' : fire['bright_ti5'],
+      'frp': fire['frp'],
+      'instrument': fire['instrument'],
+      'latitude': fire['latitude'],
+      'longitude': fire['longitude'],
+      'satellite': fire['satellite'],
+    })
+
+  return jsonify({'result' : output})
 
 if __name__ == "__main__":
     app.run()
