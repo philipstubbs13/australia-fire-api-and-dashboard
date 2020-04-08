@@ -12,19 +12,19 @@ app = Flask(__name__)
 # Constants
 is_prod = os.environ.get('DATABASE_USERNAME', '')
 api_base_url = '/api/v1.0/'
-db_name = 'australia_fire_db'
+db_name = 'test'
 
 # If this app is on production/deployed to heroku.
 if is_prod:
   app.debug = False
   username = os.environ.get('DATABASE_USERNAME', '')
   password = os.environ.get('DATABASE_PASSWORD', '')
-  app.config['MONGO_URI'] = f'mongodb+srv://{username}:{password}@cluster0-acs53.mongodb.net/test?retryWrites=true&w=majority'
+  app.config['MONGO_URI'] = f'mongodb+srv://phil:{password}@cluster0-laoqs.mongodb.net/test?retryWrites=true&w=majority'
   app.config['MONGO_DBNAME'] = db_name
 # else if you are running the app locally.
 else:
   app.debug = True
-  app.config['MONGO_URI'] = f'mongodb://localhost:27017/{db_name}'
+  app.config['MONGO_URI'] = f'mongodb+srv://phil:phil@cluster0-laoqs.mongodb.net/test?retryWrites=true&w=majority'
 
 mongo = PyMongo(app)
 
@@ -38,7 +38,7 @@ def api_docs():
 @app.route(f"{api_base_url}fires_modis", methods=['GET'])
 def fires_modis():
 
-  data = mongo.db.fires_modis.find()
+  data = mongo.db.fires_from_space.find()
 
   output = []
 
@@ -54,7 +54,6 @@ def fires_modis():
       'latitude': fire['latitude'],
       'longitude': fire['longitude'],
       'satellite': fire['satellite'],
-      'bright_t31': fire['bright_t31']
     })
 
   return jsonify({'result' : output})
