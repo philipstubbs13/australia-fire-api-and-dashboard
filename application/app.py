@@ -12,14 +12,14 @@ app = Flask(__name__)
 # Constants
 is_prod = os.environ.get('DATABASE_USERNAME', '')
 api_base_url = '/api/v1.0/'
-db_name = 'test'
+db_name = 'australia_fire_db'
 
 # If this app is on production/deployed to heroku.
 if is_prod:
   app.debug = False
   username = os.environ.get('DATABASE_USERNAME', '')
   password = os.environ.get('DATABASE_PASSWORD', '')
-  app.config['MONGO_URI'] = f'mongodb+srv://{username}:{password}@cluster0-laoqs.mongodb.net/test?retryWrites=true&w=majority'
+  app.config['MONGO_URI'] = f'mongodb+srv://phil:{password}@cluster0-acs53.mongodb.net/test?retryWrites=true&w=majority'
   app.config['MONGO_DBNAME'] = db_name
 # else if you are running the app locally.
 else:
