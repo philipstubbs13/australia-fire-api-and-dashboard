@@ -19,7 +19,8 @@ if is_prod:
   app.debug = False
   username = os.environ.get('DATABASE_USERNAME', '')
   password = os.environ.get('DATABASE_PASSWORD', '')
-  app.config['MONGO_URI'] = f'mongodb+srv://{username}:{password}@cluster0-laoqs.mongodb.net/test?retryWrites=true&w=majority'
+  mongo_uri = os.environ.get('MONGO_URI', '')
+  app.config['MONGO_URI'] = mongo_uri
   app.config['MONGO_DBNAME'] = db_name
 # else if you are running the app locally.
 else:
@@ -54,9 +55,8 @@ def fires_modis():
       'latitude': fire['latitude'],
       'longitude': fire['longitude'],
       'satellite': fire['satellite'],
+      'bright_t31': fire['bright_t31']
     })
-
-  print(len(output))
 
   return jsonify({'result' : output})
 
