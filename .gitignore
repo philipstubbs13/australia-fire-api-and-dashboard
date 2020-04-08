@@ -1,5 +1,6 @@
-# Local credentials
 config.js
+.ipynb_checkpoints
+*.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
