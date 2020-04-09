@@ -30,8 +30,6 @@ else:
 
 mongo = PyMongo(app)
 
-print(api_base_url)
-
 @app.route("/data")
 def data_page():
   data = {'api_base_url': f'{api_base_url}{api_version}' }
