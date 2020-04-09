@@ -29,6 +29,10 @@ else:
 
 mongo = PyMongo(app)
 
+@app.route("/data")
+def data_page():
+  return render_template("data.html")
+
 # Route for api docs page.
 @app.route("/")
 @app.route(f"{api_base_url}docs")
