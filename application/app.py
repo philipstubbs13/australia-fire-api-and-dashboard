@@ -11,7 +11,8 @@ app = Flask(__name__)
 
 # Constants
 is_prod = os.environ.get('DATABASE_USERNAME', '')
-api_base_url = '/api/v1.0/'
+api_version = 'v1.0'
+api_base_url = os.environ.get('API_BASE_URL', '') or 'http://localhost:5000/api/'
 db_name = 'australia_fire_db'
 
 # If this app is on production/deployed to heroku.
@@ -31,16 +32,18 @@ mongo = PyMongo(app)
 
 @app.route("/data")
 def data_page():
-  return render_template("data.html")
+  data = {'api_base_url': f'{api_base_url}{api_version}' }
+  return render_template("data.html", data=data)
 
 # Route for api docs page.
 @app.route("/")
-@app.route(f"{api_base_url}docs")
+@app.route(f"/api/{api_version}/docs")
 def api_docs():
-    return render_template("api_documentation.html")
+    data = {'api_base_url': f'{api_base_url}{api_version}' }
+    return render_template("api_documentation.html", data=data)
 
 # GET request - all the MODIS fires.
-@app.route(f"{api_base_url}fires_modis", methods=['GET'])
+@app.route(f"/api/{api_version}/fires_modis", methods=['GET'])
 def fires_modis():
 
   data = mongo.db.fires_modis.find()
@@ -65,7 +68,7 @@ def fires_modis():
   return jsonify({'result' : output})
 
 # GET request - all the VIIRS fires.
-@app.route(f"{api_base_url}fires_viirs", methods=['GET'])
+@app.route(f"/api/{api_version}/fires_viirs", methods=['GET'])
 def fires_viirs():
 
   data = mongo.db.fires_viirs.find()

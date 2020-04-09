@@ -1,4 +1,4 @@
-const fires_modis_url = 'https://australia-fire-api-dashboard.herokuapp.com/api/v1.0/fires_modis';
+const fires_modis_url = `${api_base_url}/fires_modis`;
 const table = d3.select('#fires-modis-table');
 const tableBody = table.select('tbody');
 
