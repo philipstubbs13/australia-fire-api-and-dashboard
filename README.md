@@ -62,7 +62,7 @@ The API (backend) and the dashboard site (frontend) for this project are built u
 
 To start the Flask server locally:
 
-1. If not already, activate the python virtual environment:
+1. If not already activated, activate the python virtual environment:
 
 ```bash
 conda activate PythonData
@@ -90,6 +90,8 @@ d3.json(url).then(data => {
   console.log(data);
 });
 ```
+
+Another example can be found [here](./application/static/js/buildDataTable.js).
 
 ## Deployment
 
