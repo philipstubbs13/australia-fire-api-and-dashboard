@@ -1,3 +1,4 @@
+console.log(api_base_url);
 const fires_modis_url = `${api_base_url}/fires_modis`;
 const table = d3.select('#fires-modis-table');
 const tableBody = table.select('tbody');
