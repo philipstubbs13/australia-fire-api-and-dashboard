@@ -1,14 +1,36 @@
-var satData = "modis.csv";
+const satData = "modis.csv";
+const states = "https://raw.githubusercontent.com/rowanhogan/australian-states/master/states.geojson"
+// TODO load in second dataset, create function that allows them to choose which dataset to use
+
+//////////// CALCULATE ANIMAL DEATHS PER STATE //////////////////
+// Uses general formula described in https://www.bbc.com/news/50986293
+
+// Estimated number of animals killed per acre
+const mammals = 7.25;
+const birds = 8.38;
+const reptiles = 52.41;
+
+// multiplied by amount of land hit by fires
+
+
 
 //////////// IMPORT THE DATA //////////////////
-function getData(data) {
-  d3.csv(data).then(data => {
+function getData(satData) {
+  d3.csv(satData).then(satData => {
 
-    // load territory data
+    // load state data from https://github.com/rowanhogan/australian-states
+    d3.json(states).then(stateData => {
+
+      let newData = stateData.features;
 
       // load hectare burned data and perform calculations on estimated animal deaths
 
-      makeFeatures(data);
+      makeFeatures(satData, newData);
+
+    }).catch(e => {
+      console.log(e);
+    });
+      
   }).catch(e => {
     console.log(e);
   });
@@ -17,43 +39,56 @@ function getData(data) {
 getData(satData);
 
 //////////// MAKE THE FEATURES //////////////////
-function makeFeatures(data) {
+function makeFeatures(data, stateData) {
 
   // make heatmap
-  var heatArray = [];
+  let heatArray = [];
 
   for (var i = 0; i < data.length; i++) {
-    var datapoint = data[i];
+    let datapoint = data[i];
 
     if (datapoint) {
       heatArray.push([datapoint.latitude, datapoint.longitude, datapoint.brightness]);
     }
   }
 
-  var heat = L.heatLayer(heatArray, {
+  let heat = L.heatLayer(heatArray, {
     radius: 20,
     blur: 35
   });
 
+  // make state boundaries
+
+  // feature creation function
+  function onEachFeature(feature, layer) {
+    L.polyline(feature.geometry.coordinates)
+  }
+  
+  // call feature function "onEachFeature" to make state boundaries
+  let borders = L.geoJSON(stateData, {
+    onEachFeature: onEachFeature
+  });
+  console.log(borders);
+
 
 
   // call makemap function to create the basemap and apply the features
-  makeMap(heat);
+  makeMap(heat, borders);
   
 }
 
 //////////// CREATE THE MAP //////////////////
-function makeMap(heat) {
+function makeMap(heat, borders) {
   // Define map style option layers
 
-  var satellite = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+  let satellite = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
     attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
     maxZoom: 18,
     id: "mapbox.satellite",
     accessToken: API_KEY
   });
 
-  var outdoors = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+  let outdoors = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
     attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
     maxZoom: 18,
     id: "mapbox.outdoors",
@@ -61,15 +96,14 @@ function makeMap(heat) {
   });
 
   // Define a baseMaps object for maps layers
-  var baseMaps = {
+  let baseMaps = {
     "Satellite": satellite,
     "Outdoors": outdoors
   };
 
   // Define overlayMaps for marker layers
-  var overlayMaps = {
-    // "Fault Lines": faultlines,
-    // "Earthquakes": earthquakes
+  let overlayMaps = {
+    "States": borders,
     "Fire intensity": heat
   };
 
@@ -93,13 +127,15 @@ function makeMap(heat) {
   //   return div;
   // };
 
+  // create a slider for date data (to see changes by day) https://digital-geography.com/filter-leaflet-maps-slider/
+
   // Create a layer control
-  var layerControl = L.control.layers(baseMaps, overlayMaps, {
+  let layerControl = L.control.layers(baseMaps, overlayMaps, {
     collapsed: false
   });
 
   // Create our map object
-  var myMap = L.map("map", {
+  let myMap = L.map("map", {
     center: [
       -25.799055, 134.538941
     ],
