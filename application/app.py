@@ -35,11 +35,6 @@ def home_page():
   data = {'api_base_url': f'{api_base_url}{api_version}' }
   return render_template("home.html", data=data)
 
-@app.route("/charts")
-def charts_page():
-  data = {'api_base_url': f'{api_base_url}{api_version}' }
-  return render_template("charts.html", data=data)
-
 @app.route("/data")
 def data_page():
   data = {'api_base_url': f'{api_base_url}{api_version}' }
@@ -96,6 +91,29 @@ def fires_viirs():
       'latitude': fire['latitude'],
       'longitude': fire['longitude'],
       'satellite': fire['satellite'],
+    })
+
+  return jsonify({'result' : output})
+
+# GET request - all historical/past fires.
+@app.route(f"/api/{api_version}/historical_fires", methods=['GET'])
+def historical_fires():
+
+  data = mongo.db.historicalFires.find()
+
+  output = []
+
+  for fire in data:
+    output.append({
+      'id': str(fire['_id']),
+      'date': fire['Date'],
+      'name': fire['Name'],
+      'state' : fire['State(s)/territories'],
+      'area_burned_ha' : fire['AreaBurned(ha)'],
+      'area_burned_acres': fire['AreaBurned(acres)'],
+      'fatalities': fire['Fatalities'],
+      'homes_destroyed': fire['PropertiesDamaged(HomesDestroyed)'],
+      'year': fire['Year'],
     })
 
   return jsonify({'result' : output})

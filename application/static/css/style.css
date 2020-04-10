@@ -1,7 +1,6 @@
 :root {
   --link-color: #00bc8c;
   --light-color: #fff;
-  --accent-color: orangered;
 }
 
 .navbar a {
@@ -10,4 +9,9 @@
 
 .navbar a:hover {
   color: var(--link-color) !important;
+}
+
+code {
+  display: block;
+  white-space: pre-wrap   
 }
