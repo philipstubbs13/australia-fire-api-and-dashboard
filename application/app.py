@@ -96,8 +96,8 @@ def fires_viirs():
   return jsonify({'result' : output})
 
 # GET request - all historical/past fires.
-@app.route(f"/api/{api_version}/historical_fires", methods=['GET'])
-def historical_fires():
+@app.route(f"/api/{api_version}/fires_historical", methods=['GET'])
+def fires_historical():
 
   data = mongo.db.historicalFires.find()
 

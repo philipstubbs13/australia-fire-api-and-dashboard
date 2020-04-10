@@ -9,11 +9,7 @@ To load the data into a local database, perform these steps:
 1. Start MongoDB locally by running `mongod` from the terminal.
 2. Open the [etl_fires_from_space.ipynb](./etl_fires_from_space.ipynb) jupyter notebook file and run the cells to extract, transform, and load the data.
 3. Open the [WebScrapping.ipynb](./WebScrapping.ipynb) jupyter notebook file and run the cells to scrape and load the data.
-4. Verify the data is inserted by opening MongoDB Compass and looking for the **australia_fire_db** database.
-
-## Data Flow
-
-![Data Flow](./images/data_flow.png)
+4. Verify the data is inserted by opening MongoDB Compass and looking for the **australia_fire_db** database.s
 
 ## Data Structure
 
