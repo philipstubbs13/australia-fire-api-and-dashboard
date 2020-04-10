@@ -99,7 +99,7 @@ def fires_viirs():
 @app.route(f"/api/{api_version}/fires_historical", methods=['GET'])
 def fires_historical():
 
-  data = mongo.db.historicalFires.find()
+  data = mongo.db.historical_fires.find()
 
   output = []
 
