@@ -1,0 +1,12 @@
+:root {
+  --main-bg-color: black;
+  --app-dark-color: darkslategray;
+  --app-secondary-color: #66c010;
+  --app-light-color: #fff;
+  --app-pink-color: rgb(255, 167, 196);
+  --accent-color: orangered;
+}
+
+.navbar a {
+  color: var(--app-light-color) !important;
+}

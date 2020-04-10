@@ -30,13 +30,22 @@ else:
 
 mongo = PyMongo(app)
 
+@app.route("/")
+def home_page():
+  data = {'api_base_url': f'{api_base_url}{api_version}' }
+  return render_template("home.html", data=data)
+
+@app.route("/charts")
+def charts_page():
+  data = {'api_base_url': f'{api_base_url}{api_version}' }
+  return render_template("charts.html", data=data)
+
 @app.route("/data")
 def data_page():
   data = {'api_base_url': f'{api_base_url}{api_version}' }
   return render_template("data.html", data=data)
 
 # Route for api docs page.
-@app.route("/")
 @app.route(f"/api/{api_version}/docs")
 def api_docs():
     data = {'api_base_url': f'{api_base_url}{api_version}' }

@@ -1,5 +1,34 @@
 {% extends 'layout.html' %} {% block body %}
-<table class="table table-striped" id="fires-modis-table">
+<h3 class="mt-4">About the Data</h3>
+<p>The visualizations created for this project were built using data from the following sources:</p>
+<ul>
+  <li>
+    <a href="https://www.kaggle.com/carlosparadis/fires-from-space-australia-and-new-zeland" target="_blank">Fires from
+      Space:
+      Australia</a> from kaggle by Carlos Paradis
+  </li>
+  <li>Scraped data using Beautiful Soup from <a
+      href="https://en.wikipedia.org/wiki/List_of_fires_and_impacts_of_the_2019-20_Australian_bushfire_season"
+      target="_blank">List of 2019-2020 bushfires by state</a></li>
+  <li>Scraped data using Beautiful Soup from <a
+      href="https://en.wikipedia.org/wiki/List_of_major_bushfires_in_Australia" target="_blank">List of Major Bushfires
+      in Australia</a></li>
+  <li>Scraped data using Beautiful Soup from <a
+      href="https://en.wikipedia.org/wiki/2019%E2%80%9320_Australian_bushfire_season" target="_blank">2019 - 2020
+      Australia bushfire season</a></li>
+  <li><a href="https://github.com/tonywr71/GeoJson-Data" target="_blank">Geojson data for Australia</a> by <a
+      href="https://github.com/tonywr71">tonywr71</a></li>
+  <li><a href="http://www.bom.gov.au/climate/data/" target="_blank">Australia Climate Data</a> from the Australia
+    Government Bureau of Meteorology</li>
+</ul>
+<h3 class="mt-4">About the API</h3>
+<p>
+  The data used for this project was extracted, transformed, and loaded into a MongoDB database on MongoDB Atlas. This
+  data is available for use through a Python Flask-powered RESTful API. For more information about accessing and using
+  this api, see the <a href="https://australia-fire-api-dashboard.herokuapp.com/api/v1.0/docs" target="_blank">Australia
+    Fire API</a> documentation page.
+</p>
+<table class="table table-striped mt-5" id="fires-modis-table">
   <thead>
     <tr>
       <th class="table-head">acq_date</th>
