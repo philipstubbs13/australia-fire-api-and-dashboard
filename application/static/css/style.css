@@ -1,17 +1,13 @@
-:root {
-  --link-color: #00bc8c;
-  --light-color: #fff;
-}
-
 .navbar a {
-  color: var(--light-color) !important;
+  color: #fff !important;
 }
 
 .navbar a:hover {
-  color: var(--link-color) !important;
+  color: #00bc8c !important;
 }
 
 code {
   display: block;
-  white-space: pre-wrap   
+  white-space: pre-wrap;
+  font-size: 18px;
 }
