@@ -11,6 +11,10 @@ To load the data into a local database, perform these steps:
 3. Open the [WebScrapping.ipynb](./WebScrapping.ipynb) jupyter notebook file and run the cells to scrape and load the data.
 4. Verify the data is inserted by opening MongoDB Compass and looking for the **australia_fire_db** database.
 
+## Data Flow
+
+![Data Flow](./images/data_flow.png)
+
 ## Data Structure
 
 The **australia_fire_db** currently has the following collections:
@@ -45,7 +49,7 @@ This starts the Flask server on port 5000.
 
 ## Using the API
 
-- API documentation can be found [here](https://australia-fire-api-dashboard.herokuapp.com/api/v1.0/docs), which includes information about the different endpoints available.
+- Information about the different endpoints available can be found [here](https://australia-fire-api-dashboard.herokuapp.com/api/v1.0/docs).
 
 - An example of how to get data from API using `d3.json`:
 
