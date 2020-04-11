@@ -44,20 +44,26 @@ function acresBurned(stateName) {
 }
 
 //////////// IMPORT THE DATA //////////////////
-function getData(modisURL) {
+function getData(modisURL, viirsURL) {
   d3.json(modisURL).then(modisData => {
 
-    // load state data from https://github.com/rowanhogan/australian-states
-    d3.json(states).then(stateData => {
-
-      let borderData = stateData.features;
-
-      // load hectare burned data and perform calculations on estimated animal deaths
+    d3.json(viirsURL).then(viirsData => {
       
-      makeFeatures(modisData, borderData);
+      d3.json(states).then(stateData => {
+
+        let borderData = stateData.features;
+  
+        // load hectare burned data and perform calculations on estimated animal deaths
+        
+        makeFeatures(modisData, viirsData, borderData);
+  
+      }).catch(e => {
+        console.log(e);
+      });
 
     }).catch(e => {
       console.log(e);
+
     });
       
   }).catch(e => {
@@ -65,26 +71,40 @@ function getData(modisURL) {
   });
 }
 
-getData(modisURL);
+getData(modisURL, viirsURL);
 
 //////////// MAKE THE FEATURES //////////////////
-function makeFeatures(satData, stateData) {
+function makeFeatures(modisData, viirsData, stateData) {
 
-  const satDataArr = Object.entries(satData);
-  // console.log(satDataArr[0][1]);
+  const modisDataArr = Object.entries(modisData);
+  const viirsDataArr = Object.entries(viirsData);
 
-  // make heatmap
-  let heatArray = [];
+  // make heatmaps
+  let modisHeatArray = [];
+  let viirsHeatArray = [];
 
-  for (var i = 0; i < satDataArr[0][1].length; i++) {
-    let datapoint = satDataArr[0][1][i];
+  for (var i = 0; i < modisDataArr[0][1].length; i++) {
+    let datapoint = modisDataArr[0][1][i];
 
     if (datapoint) {
-      heatArray.push([datapoint.latitude, datapoint.longitude, datapoint.brightness]);
+      modisHeatArray.push([datapoint.latitude, datapoint.longitude, datapoint.brightness]);
     }
   }
 
-  let heat = L.heatLayer(heatArray, {
+  let modisHeat = L.heatLayer(modisHeatArray, {
+    radius: 20,
+    blur: 35
+  });
+
+  for (var i = 0; i < viirsDataArr[0][1].length; i++) {
+    let datapoint = viirsDataArr[0][1][i];
+
+    if (datapoint) {
+      viirsHeatArray.push([datapoint.latitude, datapoint.longitude, datapoint.brightness]);
+    }
+  }
+
+  let viirsHeat = L.heatLayer(viirsHeatArray, {
     radius: 20,
     blur: 35
   });
@@ -112,12 +132,12 @@ function makeFeatures(satData, stateData) {
   });
 
   // call makemap function to create the basemap and apply the features
-  makeMap(heat, borders);
+  makeMap(modisHeat, viirsHeat, borders);
   
 }
 
 //////////// CREATE THE MAP //////////////////
-function makeMap(heat, borders) {
+function makeMap(modisHeat, viirsHeat, borders) {
   // Define map style option layers
 
   let satellite = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
@@ -143,7 +163,8 @@ function makeMap(heat, borders) {
   // Define overlayMaps for marker layers
   let overlayMaps = {
     "States": borders,
-    "Fire intensity": heat
+    "Fire intensity (MODIS)": modisHeat,
+    "Fire intensity (VIIRS)": viirsHeat
   };
 
   // // Create a legend
@@ -179,7 +200,7 @@ function makeMap(heat, borders) {
       -25.799055, 134.538941
     ],
     zoom: 5, 
-    layers: [outdoors, heat] // TODO Add in features here
+    layers: [outdoors, modisHeat] // TODO Add in features here
   });
 
   // Add legend to the map
@@ -188,6 +209,4 @@ function makeMap(heat, borders) {
   layerControl.addTo(myMap);
 
 }
-
-// makeMap(satData);
 
