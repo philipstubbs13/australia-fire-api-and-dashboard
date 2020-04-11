@@ -173,6 +173,24 @@ def bushfire_season_2019():
 
   return jsonify({'result' : output})
 
+# GET request - temp and rainfall data
+@app.route(f"/api/{api_version}/aus_temp_rainfall", methods=['GET'])
+@cross_origin()
+def aus_temp_rainfall():
+
+  data = mongo.db.temp_rainfall.find()
+
+  output = []
+
+  for fire in data:
+    output.append({
+      'id': str(fire['_id']),
+      'year': fire['Year'],
+      'avg_annual_temp': fire['Avg Annual Temp'],
+      'avg_annual_rainfall' : fire['Avg Annual Rainfall']
+    })
+
+  return jsonify({'result' : output})
 
 if __name__ == "__main__":
     app.run()
