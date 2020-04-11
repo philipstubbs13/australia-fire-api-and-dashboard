@@ -100,7 +100,7 @@ function makeFeatures(modisData, viirsData, stateData) {
     let datapoint = viirsDataArr[0][1][i];
 
     if (datapoint) {
-      viirsHeatArray.push([datapoint.latitude, datapoint.longitude, datapoint.brightness]);
+      viirsHeatArray.push([datapoint.latitude, datapoint.longitude, datapoint.bright_ti4]);
     }
   }
 
@@ -129,6 +129,17 @@ function makeFeatures(modisData, viirsData, stateData) {
   // call feature function "onEachFeature" to make state boundaries
   let borders = L.geoJSON(stateData, {
     onEachFeature: onEachFeature
+  });
+
+  // create timeline layer feature
+  let timelineLayer = L.timeline(modisDataArr[0][1], {
+    getInterval: function(datapoint) {
+      return {
+        start: datapoint.acq_time,
+        end: datapoint.acq_time
+      };
+    },
+    pointToLayer: modisHeat
   });
 
   // call makemap function to create the basemap and apply the features
@@ -210,3 +221,6 @@ function makeMap(modisHeat, viirsHeat, borders) {
 
 }
 
+// create endpoint that would grab data from MongoDB, create JSON -> GeoJSON and then serve it
+
+// https://stackoverflow.com/questions/55887875/how-to-convert-json-to-geojson
