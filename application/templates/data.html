@@ -1,0 +1,50 @@
+{% extends 'layout.html' %} {% block body %}
+<h3 class="mt-4">About the Data</h3>
+<p>The visualizations created for this project were built usind data from the following sources:</p>
+<ul>
+  <li>
+    <a href="https://www.kaggle.com/carlosparadis/fires-from-space-australia-and-new-zeland" target="_blank">Fires from
+      Space:
+      Australia</a> from kaggle by Carlos Paradis.
+    <p>
+      Includes information for Australia fires from the 2019 - 2020 fire season as recorded by NASA satellites.
+    </p>
+  </li>
+  <li><a href="https://en.wikipedia.org/wiki/List_of_fires_and_impacts_of_the_2019-20_Australian_bushfire_season"
+      target="_blank">List of 2019-2020 bushfires by state</a> (Scraped data using beautiful soup).</li>
+  <li><a href="https://en.wikipedia.org/wiki/List_of_major_bushfires_in_Australia" target="_blank">List of Major
+      Bushfires
+      in Australia</a> (Scraped data using Beautiful Soup).</li>
+  <li><a href="https://en.wikipedia.org/wiki/2019%E2%80%9320_Australian_bushfire_season" target="_blank">2019 - 2020
+      Australia bushfire season</a> (Scraped data using Beautiful Soup).</li>
+  <li><a href="https://github.com/tonywr71/GeoJson-Data" target="_blank">Geojson data for Australia</a> by <a
+      href="https://github.com/tonywr71">tonywr71</a>.</li>
+  <li><a href="http://www.bom.gov.au/climate/data/" target="_blank">Australia Climate Data</a> from the Australia
+    Government Bureau of Meteorology.</li>
+</ul>
+<h3 class="mt-4">About the API</h3>
+<p>
+  The data used for this project was loaded into a MongoDB database and is available through a Python Flask-powered API.
+  For more information, see the <a href="/api/v1.0/docs" target="_blank">Australia
+    Fire API</a> documentation.
+</p>
+<p>The following table shows an example of the data the the API returns. This specific example was used to build the map
+  for this project to help visualize the location and intensity of Australia fires.</p>
+<table class="table table-responsive table-striped mt-5 table-hover" id="fires-modis-table">
+  <thead class="thead-dark">
+    <tr>
+      <th class="table-head">acq_date</th>
+      <th class="table-head">acq_time</th>
+      <th class="table-head">bright_t31</th>
+      <th class="table-head">brightness</th>
+      <th class="table-head">daynight</th>
+      <th class="table-head">frp</th>
+      <th class="table-head">instrument</th>
+      <th class="table-head">latitude</th>
+      <th class="table-head">longitude</th>
+      <th class="table-head">satellite</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+{% endblock %}
