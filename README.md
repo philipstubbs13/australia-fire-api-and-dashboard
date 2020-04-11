@@ -60,4 +60,4 @@ Another example can be found [here](./application/static/js/buildDataTable.js).
 
 ## Deployment
 
-The site is deployed to Heroku, where the API and site are hosted. Deploys to Heroku are currently set up to happen automatically any time changes are pushed to the repo into master. It is currently hosted at <https://australia-fire-api-dashboard.herokuapp.com/>.
+The site is deployed to Heroku, where the API and site are hosted. It is currently hosted at <https://australia-fire-api-dashboard.herokuapp.com/>.
