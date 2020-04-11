@@ -185,9 +185,9 @@ def aus_temp_rainfall():
   for fire in data:
     output.append({
       'id': str(fire['_id']),
-      'Year': fire['Year'],
-      'Avg Annual Temp': fire['Avg Annual Temp'],
-      'Avg Annual Rainfall' : fire['Avg Annual Rainfall']
+      'year': fire['Year'],
+      'avg_annual_temp': fire['Avg Annual Temp'],
+      'avg_annual_rainfall' : fire['Avg Annual Rainfall']
     })
 
   return jsonify({'result' : output})
