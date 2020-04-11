@@ -4,7 +4,7 @@ const svgHeight = 450;
 const margin = {
   top: 10,
   right: 40,
-  bottom: 100,
+  bottom: 110,
   left: 160
 };
 
@@ -47,6 +47,14 @@ const drawHistoricalComparisonChart = () => {
     .attr("fill", "orangered")
     .html(fireSeason201920);
 
+  // Legend text
+  chartGroup.append("text")
+    .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + margin.top + 90})`)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "16px")
+    .attr("fill", "black")
+    .html("Fires before 2019-20 season");
+
   // Legend icon
   chartGroup.append("circle")
     .attr("transform", `translate(${chartWidth / 2 - 195}, ${chartHeight + 15})`)
@@ -56,6 +64,17 @@ const drawHistoricalComparisonChart = () => {
     .attr("stroke", "orangered")
     .attr("stroke-width", "5")
     .attr("fill", "orangered")
+    .attr("opacity", "0.6")
+
+  // Legend icon
+  chartGroup.append("circle")
+    .attr("transform", `translate(${chartWidth / 2 - 195}, ${chartHeight + 42})`)
+    .attr("cx", 50)
+    .attr("cy", 50)
+    .attr("r", "7")
+    .attr("stroke", "black")
+    .attr("stroke-width", "5")
+    .attr("fill", "black")
     .attr("opacity", "0.6")
 
 
