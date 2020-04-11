@@ -1,31 +1,70 @@
-const satData = "modis.csv";
+const modisURL = "modis.csv";
 const states = "https://raw.githubusercontent.com/rowanhogan/australian-states/master/states.geojson"
+// https://australia-fire-api-dashboard.herokuapp.com/api/v1.0/fires_modis
+// https://australia-fire-api-dashboard.herokuapp.com/api/v1.0/fires_viirs
+
 // TODO load in second dataset, create function that allows them to choose which dataset to use
 
 //////////// CALCULATE ANIMAL DEATHS PER STATE //////////////////
 // Uses general formula described in https://www.bbc.com/news/50986293
 
-// Estimated number of animals killed per acre
-const mammals = 7.25;
-const birds = 8.38;
-const reptiles = 52.41;
+// variable to hold calculations, to make later popover
+const deathsByState = [];
 
-// multiplied by amount of land hit by fires
+function animalDeaths(acreData, stateName) {
+  // Estimated number of animals killed per acre
+  const mammals = 7.25;
+  const birds = 8.38;
+  const reptiles = 52.41;
 
+  // multiplied by amount of land hit by fires in each state (acreData)
+  let mammalDeaths = Math.round(mammals * acreData);
+  let birdDeaths = Math.round(birds * acreData);
+  let reptileDeaths = Math.round(reptiles * acreData);
 
+  let stateDeaths = {
+    "state": stateName,
+    "mammals": mammalDeaths,
+    "birds": birdDeaths,
+    "reptiles": reptileDeaths
+  }
+
+  deathsByState.push(stateDeaths);
+
+  // create popover for feature to display name, animal death rate
+
+}
+
+function makePopups(feature, layer) {
+  stateDeaths.forEach(state => {
+    if (state = feature.properties.STATE_NAME) {
+      layer.bindPopup("<h3>" + feature.properties.STATE_NAME + "</h3>");
+    }
+  })
+}
+
+function acresBurned(stateName) {
+  // retrieve scraped wikipedia data from API  
+  // aggregate "acres burned" by state
+  // calculate animal death rate by state
+    // using 1200 as a stand in for total acres burned
+  let acresTotal = 1200;
+  // pass this data to another function that creates popovers for states on map layer
+  animalDeaths(acresTotal, stateName);
+}
 
 //////////// IMPORT THE DATA //////////////////
-function getData(satData) {
-  d3.csv(satData).then(satData => {
+function getData(modisURL) {
+  d3.csv(modisURL).then(modisData => {
 
     // load state data from https://github.com/rowanhogan/australian-states
     d3.json(states).then(stateData => {
 
-      let newData = stateData.features;
+      let borderData = stateData.features;
 
       // load hectare burned data and perform calculations on estimated animal deaths
-
-      makeFeatures(satData, newData);
+      
+      makeFeatures(modisData, borderData);
 
     }).catch(e => {
       console.log(e);
@@ -36,16 +75,16 @@ function getData(satData) {
   });
 }
 
-getData(satData);
+getData(modisURL);
 
 //////////// MAKE THE FEATURES //////////////////
-function makeFeatures(data, stateData) {
+function makeFeatures(satData, stateData) {
 
   // make heatmap
   let heatArray = [];
 
-  for (var i = 0; i < data.length; i++) {
-    let datapoint = data[i];
+  for (var i = 0; i < satData.length; i++) {
+    let datapoint = satData[i];
 
     if (datapoint) {
       heatArray.push([datapoint.latitude, datapoint.longitude, datapoint.brightness]);
@@ -59,18 +98,21 @@ function makeFeatures(data, stateData) {
 
   // make state boundaries
 
-  // feature creation function
+  // feature creation function & get state names
+  let stateNames = [];
+
   function onEachFeature(feature, layer) {
-    L.polyline(feature.geometry.coordinates)
+    L.polyline(feature.geometry.coordinates);
+    acresBurned(feature.properties.STATE_NAME);
   }
   
   // call feature function "onEachFeature" to make state boundaries
   let borders = L.geoJSON(stateData, {
+    // onEachFeature: onEachFeature, makePopups
     onEachFeature: onEachFeature
   });
-  console.log(borders);
 
-
+  console.log(deathsByState);
 
   // call makemap function to create the basemap and apply the features
   makeMap(heat, borders);
