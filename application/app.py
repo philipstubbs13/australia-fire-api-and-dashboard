@@ -6,13 +6,18 @@ from flask import (
     request,
     redirect)
 from flask_pymongo import PyMongo
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
+CORS(app)
 
 # Constants
 is_prod = os.environ.get('DATABASE_USERNAME', '')
 api_version = 'v1.0'
 api_base_url = os.environ.get('API_BASE_URL', '') or 'http://localhost:5000/api/'
+
+# Cors
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 # If this app is on production/deployed to heroku.
 if is_prod:
@@ -43,12 +48,14 @@ def data_page():
 
 # Route for api docs page.
 @app.route(f"/api/{api_version}/docs")
+@cross_origin()
 def api_docs():
     data = {'api_base_url': f'{api_base_url}{api_version}' }
     return render_template("api_documentation.html", data=data)
 
 # GET request - all the MODIS fires.
 @app.route(f"/api/{api_version}/fires_modis", methods=['GET'])
+@cross_origin()
 def fires_modis():
 
   data = mongo.db.fires_modis.find()
@@ -74,6 +81,7 @@ def fires_modis():
 
 # GET request - all the VIIRS fires.
 @app.route(f"/api/{api_version}/fires_viirs", methods=['GET'])
+@cross_origin()
 def fires_viirs():
 
   data = mongo.db.fires_viirs.find()

@@ -9,7 +9,7 @@ d3.json(fires_modis_url).then(data => {
     let newRow = tableBody.append('tr');
 
     // Insert a cell in the row at index, create text nodes for each, append a text node to the cell
-    Object.entries(fire).forEach(function([key, value]) {
+    Object.entries(fire).forEach(function ([key, value]) {
       if (key !== 'id') {
         newRow.append('td').text(value.toString());
       }
