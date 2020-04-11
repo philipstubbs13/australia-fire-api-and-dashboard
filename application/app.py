@@ -41,6 +41,11 @@ def home_page():
   data = {'api_base_url': f'{api_base_url}{api_version}' }
   return render_template("home.html", data=data)
 
+@app.route("/charts")
+def charts_page():
+  data = {'api_base_url': f'{api_base_url}{api_version}' }
+  return render_template("charts.html", data=data)
+
 @app.route("/data")
 def data_page():
   data = {'api_base_url': f'{api_base_url}{api_version}' }
@@ -48,7 +53,6 @@ def data_page():
 
 # Route for api docs page.
 @app.route(f"/api/{api_version}/docs")
-@cross_origin()
 def api_docs():
     data = {'api_base_url': f'{api_base_url}{api_version}' }
     return render_template("api_documentation.html", data=data)
@@ -106,6 +110,7 @@ def fires_viirs():
 
 # GET request - all historical/past fires.
 @app.route(f"/api/{api_version}/fires_historical", methods=['GET'])
+@cross_origin()
 def fires_historical():
 
   data = mongo.db.historicalFires.find()
