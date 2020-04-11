@@ -13,7 +13,6 @@ app = Flask(__name__)
 is_prod = os.environ.get('DATABASE_USERNAME', '')
 api_version = 'v1.0'
 api_base_url = os.environ.get('API_BASE_URL', '') or 'http://localhost:5000/api/'
-db_name = 'test'
 
 # If this app is on production/deployed to heroku.
 if is_prod:
@@ -21,11 +20,13 @@ if is_prod:
   username = os.environ.get('DATABASE_USERNAME', '')
   password = os.environ.get('DATABASE_PASSWORD', '')
   mongo_uri = os.environ.get('MONGO_URI', '')
+  db_name = os.environ.get('DB_NAME', '')
   app.config['MONGO_URI'] = mongo_uri
   app.config['MONGO_DBNAME'] = db_name
 # else if you are running the app locally.
 else:
   app.debug = True
+  db_name = 'australia_fire_db'
   app.config['MONGO_URI'] = f'mongodb://localhost:27017/{db_name}'
 
 mongo = PyMongo(app)
@@ -99,7 +100,7 @@ def fires_viirs():
 @app.route(f"/api/{api_version}/fires_historical", methods=['GET'])
 def fires_historical():
 
-  data = mongo.db.historical_fires.find()
+  data = mongo.db.historicalFires.find()
 
   output = []
 
