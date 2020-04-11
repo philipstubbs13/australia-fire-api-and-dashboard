@@ -39,6 +39,7 @@ const drawHistoricalComparisonChart = () => {
   const chartGroup = svg.append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
+  // Legend text
   chartGroup.append("text")
     .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + margin.top + 60})`)
     .attr("text-anchor", "middle")
@@ -46,6 +47,7 @@ const drawHistoricalComparisonChart = () => {
     .attr("fill", "orangered")
     .html(fireSeason201920);
 
+  // Legend icon
   chartGroup.append("circle")
     .attr("transform", `translate(${chartWidth / 2 - 195}, ${chartHeight + 15})`)
     .attr("cx", 50)
