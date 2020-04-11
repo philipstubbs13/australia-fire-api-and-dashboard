@@ -132,5 +132,47 @@ def fires_historical():
 
   return jsonify({'result' : output})
 
+# GET request - all of the 2019-2020 bushfire info by state
+@app.route(f"/api/{api_version}/fires_bystate", methods=['GET'])
+@cross_origin()
+def fires_bystate():
+
+  data = mongo.db.bushfiresbyState.find()
+
+  output = []
+
+  for fire in data:
+    output.append({
+      'id': str(fire['_id']),
+      'state': fire['State/Territory'],
+      'fatalities': fire['Fatalities'],
+      'homeslost' : fire['Homeslost'],
+      'area_burned_ha' : fire['Area(estimated)(ha)'],
+      'area_burned_acres': fire['Area(estimated)(acres)']
+    })
+
+  return jsonify({'result' : output})
+
+# GET request - additional 2019-2020 bushfire season information
+@app.route(f"/api/{api_version}/bushfire_season_2019", methods=['GET'])
+@cross_origin()
+def bushfire_season_2019():
+
+  data = mongo.db.aus2019_2020.find()
+
+  output = []
+
+  for fire in data:
+    output.append({
+      'id': str(fire['_id']),
+      'fire': fire['Fire'],
+      'state': fire['State'],
+      'local_government_area' : fire['Local Government Area(s)'],
+      'area_burned_ha' : fire['AreaImpacted(ha)']
+    })
+
+  return jsonify({'result' : output})
+
+
 if __name__ == "__main__":
     app.run()
