@@ -13,7 +13,7 @@ app = Flask(__name__)
 is_prod = os.environ.get('DATABASE_USERNAME', '')
 api_version = 'v1.0'
 api_base_url = os.environ.get('API_BASE_URL', '') or 'http://localhost:5000/api/'
-db_name = 'australia_fire_db'
+db_name = 'test'
 
 # If this app is on production/deployed to heroku.
 if is_prod:
