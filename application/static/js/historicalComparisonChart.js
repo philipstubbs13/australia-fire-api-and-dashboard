@@ -15,6 +15,8 @@ const axisLabels = {
   year: 'year'
 }
 
+const fireSeason201920 = "2019–20 Australian bushfire season";
+
 const chartWidth = svgWidth - margin.left - margin.right;
 const chartHeight = svgHeight - margin.top - margin.bottom;
 
@@ -36,6 +38,24 @@ const drawHistoricalComparisonChart = () => {
   // Append an SVG group.
   const chartGroup = svg.append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+  chartGroup.append("text")
+    .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + margin.top + 60})`)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "16px")
+    .attr("fill", "orangered")
+    .html(fireSeason201920);
+
+  chartGroup.append("circle")
+    .attr("transform", `translate(${chartWidth / 2 - 195}, ${chartHeight + 15})`)
+    .attr("cx", 50)
+    .attr("cy", 50)
+    .attr("r", "7")
+    .attr("stroke", "orangered")
+    .attr("stroke-width", "5")
+    .attr("fill", "orangered")
+    .attr("opacity", "0.6")
+
 
   // Retrieve data from the api endpoint and execute everything below.
   d3.json(api_url).then((data, err) => {
@@ -70,9 +90,21 @@ const drawHistoricalComparisonChart = () => {
       .append("circle")
       .attr("cx", d => xTimeScale(d[chosenXAxis]))
       .attr("cy", d => yLinearScale(d[chosenYAxis]))
-      .attr("r", "9")
-      .attr("fill", "orangered")
-      .attr("opacity", ".5")
+      .attr("r", (d, i) => {
+        if (d.name === fireSeason201920) {
+          return "12"
+        } else {
+          return "9"
+        }
+      })
+      .attr("fill", (d, i) => {
+        if (d.name === fireSeason201920) {
+          return "orangered"
+        } else {
+          return "black"
+        }
+      })
+      .attr("opacity", ".6")
 
 
     // Create group for x-axis labels.
