@@ -10,6 +10,7 @@ from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
 CORS(app)
+app.config['JSON_SORT_KEYS'] = False
 
 # Constants
 is_prod = os.environ.get('DATABASE_USERNAME', '')
@@ -113,7 +114,7 @@ def fires_viirs():
   return jsonify({'result' : output})
 
 # GET request - all MODIS fires in GeoJSON format
-@app.route(f"/api/{api_version}/fires_modis/geojson", methods=['GET'])
+@app.route(f"/api/{api_version}/fires_modis_geojson", methods=['GET'])
 @cross_origin()
 def fires_modis_geojson():
 
@@ -123,37 +124,59 @@ def fires_modis_geojson():
 
   for fire in data:
     output.append({
-      'id': str(fire['_id']),
-      'acq_date': fire['acq_date'],
-      'acq_time': fire['acq_time'],
-      'brightness' : fire['brightness'],
-      'daynight' : fire['daynight'],
-      'frp': fire['frp'],
-      'instrument': fire['instrument'],
-      'latitude': fire['latitude'],
-      'longitude': fire['longitude'],
-      'satellite': fire['satellite'],
-      'bright_t31': fire['bright_t31']
+      'type': 'Feature',
+      'geometry' : {
+          'type': 'Point',
+          'coordinates': [fire['longitude'], fire['latitude']],
+          },
+      'properties' : {
+        'id': str(fire['_id']),
+        'acq_date': fire['acq_date'],
+        'acq_time': fire['acq_time'],
+        'brightness' : fire['brightness'],
+        'daynight' : fire['daynight'],
+        'frp': fire['frp'],
+        'instrument': fire['instrument'],
+        'satellite': fire['satellite'],
+        'bright_t31': fire['bright_t31']
+      }
     })
 
-  return jsonify({'result' : output})
+  return jsonify({
+    "type": "FeatureCollection",
+    "features": output})
 
-  json = jsonify({'result' : output})
-  script, in_file, out_file = argv
-  data = json.load(open(in_file))
-  geojson = {
-      "type": "FeatureCollection",
-      "features": [
-      {
-          "type": "Feature",
-          "geometry" : {
-              "type": "Point",
-              "coordinates": [d.result["longitude"], d.result["latitude"]],
-              },
-          "properties" : d,
-      } for d in data]
-  }
-  return json.dump(geojson)
+# GET request - all VIIRS fires in GeoJSON format
+@app.route(f"/api/{api_version}/fires_viirs_geojson", methods=['GET'])
+@cross_origin()
+def fires_viirs_geojson():
+
+  data = mongo.db.fires_viirs.find()
+
+  output = []
+
+  for fire in data:
+    output.append({
+      'type': 'Feature',
+      'geometry' : {
+          'type': 'Point',
+          'coordinates': [fire['longitude'], fire['latitude']],
+          },
+      'properties' : {
+        'id': str(fire['_id']),
+        'acq_date': fire['acq_date'],
+        'acq_time': fire['acq_time'],
+        'bright_ti4' : fire['bright_ti4'],
+        'bright_ti5' : fire['bright_ti5'],
+        'frp': fire['frp'],
+        'instrument': fire['instrument'],
+        'satellite': fire['satellite']
+      }
+    })
+
+  return jsonify({
+    "type": "FeatureCollection",
+    "features": output})
 
 # GET request - all historical/past fires.
 @app.route(f"/api/{api_version}/fires_historical", methods=['GET'])
