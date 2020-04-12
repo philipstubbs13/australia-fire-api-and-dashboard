@@ -80,9 +80,7 @@ const drawHistoricalComparisonChart = () => {
 
   // Retrieve data from the api endpoint and execute everything below.
   d3.json(api_url).then((data, err) => {
-    if (err) {
-      throw err;
-    }
+    if (err) throw err;
 
     // Parse data/cast as numbers.
     data.result.forEach((data) => {
