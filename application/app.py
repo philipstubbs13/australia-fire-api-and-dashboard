@@ -19,6 +19,10 @@ api_base_url = os.environ.get('API_BASE_URL', '') or 'http://localhost:5000/api/
 # Cors
 app.config['CORS_HEADERS'] = 'Content-Type'
 
+# No more page caching/need to hard refresh.
+# Still need to soft refresh the page though when making changes to static files...
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0 
+
 # If this app is on production/deployed to heroku.
 if is_prod:
   app.debug = False
@@ -172,6 +176,26 @@ def bushfire_season_2019():
     })
 
   return jsonify({'result' : output})
+
+# GET request - temp and rainfall data
+@app.route(f"/api/{api_version}/aus_temp_rainfall", methods=['GET'])
+@cross_origin()
+def aus_temp_rainfall():
+
+  data = mongo.db.temp_rainfall.find()
+
+  output = []
+
+  for fire in data:
+    output.append({
+      'id': str(fire['_id']),
+      'year': fire['Year'],
+      'avg_annual_temp': fire['Avg Annual Temp'],
+      'avg_annual_rainfall' : fire['Avg Annual Rainfall']
+    })
+
+  return jsonify({'result' : output})
+
 
 # GET request - get timeseries data
 @app.route(f"/api/{api_version}/fires_time_series", methods=['GET'])
