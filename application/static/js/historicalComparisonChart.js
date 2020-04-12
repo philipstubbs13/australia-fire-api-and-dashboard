@@ -24,10 +24,6 @@ const api_url = `${api_base_url}/fires_historical`;
 
 const drawHistoricalComparisonChart = () => {
 
-  // Begin loading.
-  d3.select("#loading-historical-chart")
-    .html(`<h1 class='text-center mt-5' > Loading chart...</h1>`)
-
   // Choose the initial x-axis and y-axis to display.
   let chosenXAxis = axisLabels.year;
   let chosenYAxis = axisLabels.area_burned_acres;
@@ -85,13 +81,8 @@ const drawHistoricalComparisonChart = () => {
   // Retrieve data from the api endpoint and execute everything below.
   d3.json(api_url).then((data, err) => {
     if (err) {
-      // Stop loading.
-      d3.select("#loading-historical-chart").remove()
       throw err;
     }
-
-    // Stop loading.
-    d3.select("#loading-historical-chart").remove()
 
     // Parse data/cast as numbers.
     data.result.forEach((data) => {
