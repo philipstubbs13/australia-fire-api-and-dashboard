@@ -49,7 +49,14 @@ const buildTimeSeries = () => {
   d3.selectAll("#fires-time-series-chart").remove()
   // Begin loading.
   d3.select("#loading-time-series")
-    .html(`<h4 class='text-center mt-5' > Loading chart...</h4>`)
+    .html(`
+    <div class="text-center">
+      <h4 class='text-center mt-5' > Loading chart...</h4>
+      <div class="spinner-border spinner-border-lg text-center mt-3" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+    `)
 
   d3.json(time_series_api_url).then((data, err) => {
     if (err) {
