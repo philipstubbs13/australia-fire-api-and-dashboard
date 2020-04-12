@@ -7,6 +7,8 @@ from flask import (
     redirect)
 from flask_pymongo import PyMongo
 from flask_cors import CORS, cross_origin
+import datetime
+from flask_csv import send_csv
 
 app = Flask(__name__)
 CORS(app)
@@ -62,7 +64,7 @@ def api_docs():
 @cross_origin()
 def fires_modis():
 
-  data = mongo.db.fires_modis.find()
+  data = mongo.db.fires_modis.find().limit(100)
 
   output = []
 
@@ -172,6 +174,54 @@ def bushfire_season_2019():
     })
 
   return jsonify({'result' : output})
+
+# GET request - get timeseries data
+@app.route(f"/api/{api_version}/fires_time_series", methods=['GET'])
+@cross_origin()
+def fires_time_series():
+
+  data = mongo.db.fires_modis.find()
+
+  output = []
+
+  for fire in data:
+    output.append({
+      'id': str(fire['_id']),
+      'acq_date': fire['acq_date'],
+      'acq_time': fire['acq_time'],
+      'brightness' : fire['brightness'],
+      'daynight' : fire['daynight'],
+      'frp': fire['frp'],
+      'instrument': fire['instrument'],
+      'latitude': fire['latitude'],
+      'longitude': fire['longitude'],
+      'satellite': fire['satellite'],
+      'bright_t31': fire['bright_t31']
+    })
+
+  dates = []
+  for fire in output:
+    key = 'acq_date'
+    if key in fire.keys(): 
+      dates.append(fire[key]) 
+  
+  freq = {}
+  freq_list = []
+  for date in dates: 
+    if (date in freq): 
+      freq[date] += 1
+    else: 
+      freq[date] = 1
+  
+  for key, value in freq.items(): 
+    freq_list.append({ 'x': key, 'y': value })
+
+  return jsonify({'result' : freq_list})
+
+@app.route(f"/api/{api_version}/download", methods=['GET'])
+def downolad():
+    return send_csv([{"id": 42, "foo": "bar"}, {"id": 91, "foo": "baz"}],
+                    "test.csv", ["id", "foo"])
 
 
 if __name__ == "__main__":
