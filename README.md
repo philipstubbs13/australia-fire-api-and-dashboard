@@ -19,9 +19,9 @@ The **australia_fire_db** currently has the following collections:
 - **fires_modis** - includes australia fires detected by MODIS satellites.
 - **fires_viirs** - includes australia fires detected by VIIRS satellites.
 - **historicalFires** - includes information about past Australia fire seasons.
-- **fires_bystate** - includes information about the 2019-2020 bushfire season by state.
-- **bushfire_season_2019** - includes additional information about the 2019-2020 bushfire season.
 - **temp_rainfall** - includes Australian average annual max temperatures and rainfall from 1956-2019.
+- **bushfiresbyState** - includes information about the 2019-2020 bushfire season by state.
+- **aus2019_2020** - includes additional information about the 2019-2020 bushfire season.
 
 
 ## Original Datasets
