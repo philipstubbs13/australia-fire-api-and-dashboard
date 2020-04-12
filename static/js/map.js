@@ -2,7 +2,7 @@
 const modisURL = "https://australia-fire-api-dashboard.herokuapp.com/api/v1.0/fires_modis";
 const viirsURL = "https://australia-fire-api-dashboard.herokuapp.com/api/v1.0/fires_viirs";
 const states = "https://raw.githubusercontent.com/rowanhogan/australian-states/master/states.geojson";
-const areaURL = "http://australia-fire-api-dashboard.herokuapp.com/api/v1.0/bushfire_season_2019";
+const areaURL = "http://australia-fire-api-dashboard.herokuapp.com/api/v1.0/fires_bystate";
 
 // TODO load in second dataset, create function that allows them to choose which dataset to use
 
@@ -56,12 +56,16 @@ function animalDeaths(hectareData, stateName) {
 
   // aggregate "acres burned" by state
   let burnedInStateSum = 0;
+  let homesLost = 0;
+  let fatalities = 0;
 
   for (var i = 0; i < fireData[0][1].length; i++) {
     let datapoint = fireData[0][1][i];
 
     if (datapoint.state == stateName) {
       burnedInStateSum += datapoint.area_burned_ha;
+      fatalities += datapoint.fatalities;
+      homesLost += datapoint.homeslost;
     }
   }
 
@@ -80,9 +84,11 @@ function animalDeaths(hectareData, stateName) {
 
   let stateDeaths = {
     "state": stateName,
+    "fatalities": numberWithCommas(fatalities),
     "mammals": numberWithCommas(mammalDeaths),
     "birds": numberWithCommas(birdDeaths),
-    "reptiles": numberWithCommas(reptileDeaths)
+    "reptiles": numberWithCommas(reptileDeaths),
+    "homes_lost": numberWithCommas(homesLost)
   }
 
   deathsByState.push(stateDeaths);
@@ -135,9 +141,11 @@ function makeFeatures(modisData, viirsData, stateData, areaData) {
     animalDeaths(areaData, feature.properties.STATE_NAME);
     deathsByState.forEach(state => {
       if (state.state = feature.properties.STATE_NAME) {
-        layer.bindPopup("<h3>" + state.state + "</h3>Mammal deaths: " +
+        layer.bindPopup("<h3>" + state.state + "</h3>Fatalities: " +
+        state.fatalities + "<br>Mammal deaths: " +
         state.mammals + "<br>Bird deaths: " + state.birds
-        + "<br>Reptile deaths: " + state.reptiles);
+        + "<br>Reptile deaths: " + state.reptiles +
+        "<br>Homes lost: " + state.homes_lost);
       }
     })
   }
