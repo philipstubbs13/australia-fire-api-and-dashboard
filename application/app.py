@@ -7,8 +7,6 @@ from flask import (
     redirect)
 from flask_pymongo import PyMongo
 from flask_cors import CORS, cross_origin
-import datetime
-from flask_csv import send_csv
 
 app = Flask(__name__)
 CORS(app)
@@ -217,12 +215,6 @@ def fires_time_series():
     freq_list.append({ 'x': key, 'y': value })
 
   return jsonify({'result' : freq_list})
-
-@app.route(f"/api/{api_version}/download", methods=['GET'])
-def downolad():
-    return send_csv([{"id": 42, "foo": "bar"}, {"id": 91, "foo": "baz"}],
-                    "test.csv", ["id", "foo"])
-
 
 if __name__ == "__main__":
     app.run()
