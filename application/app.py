@@ -66,7 +66,7 @@ def api_docs():
 @cross_origin()
 def fires_modis():
 
-  data = mongo.db.fires_modis.find()
+  data = mongo.db.fires_modis.find().limit(100)
 
   output = []
 
