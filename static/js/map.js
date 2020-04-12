@@ -2,64 +2,30 @@
 const modisURL = "https://australia-fire-api-dashboard.herokuapp.com/api/v1.0/fires_modis";
 const viirsURL = "https://australia-fire-api-dashboard.herokuapp.com/api/v1.0/fires_viirs";
 const states = "https://raw.githubusercontent.com/rowanhogan/australian-states/master/states.geojson";
+const areaURL = "http://australia-fire-api-dashboard.herokuapp.com/api/v1.0/bushfire_season_2019";
 
 // TODO load in second dataset, create function that allows them to choose which dataset to use
-
-//////////// CALCULATE ANIMAL DEATHS PER STATE //////////////////
-// Uses general formula described in https://www.bbc.com/news/50986293
-
-// variable to hold calculations, to make later popover
-const deathsByState = [];
-
-function animalDeaths(hectacreData, stateName) {
-  // Estimated number of animals killed per acre
-  const mammals = 17.5;
-  const birds = 20.7;
-  const reptiles = 129.5;
-
-  // multiplied by amount of land hit by fires in each state (hectacreData)
-  let mammalDeaths = Math.round(mammals * hectacreData);
-  let birdDeaths = Math.round(birds * hectacreData);
-  let reptileDeaths = Math.round(reptiles * hectacreData);
-
-  let stateDeaths = {
-    "state": stateName,
-    "mammals": mammalDeaths,
-    "birds": birdDeaths,
-    "reptiles": reptileDeaths
-  }
-
-  deathsByState.push(stateDeaths);
-
-}
-
-function acresBurned(stateName) {
-  // retrieve scraped wikipedia data from API  
-  // aggregate "acres burned" by state
-  // calculate animal death rate by state
-    // using 1200 as a stand in for total acres burned
-  let acresTotal = 1200;
-  // pass this data to another function that creates popovers for states on map layer
-  animalDeaths(acresTotal, stateName);
-}
 
 //////////// IMPORT THE DATA //////////////////
 function getData(modisURL, viirsURL) {
   d3.json(modisURL).then(modisData => {
 
     d3.json(viirsURL).then(viirsData => {
-      
-      d3.json(states).then(stateData => {
 
-        let borderData = stateData.features;
-  
-        // load hectare burned data and perform calculations on estimated animal deaths
-        
-        makeFeatures(modisData, viirsData, borderData);
-  
-      }).catch(e => {
-        console.log(e);
-      });
+      d3.json(areaURL).then(areaData => {
+
+        d3.json(states).then(stateData => {
+
+          let borderData = stateData.features;
+          
+          makeFeatures(modisData, viirsData, borderData, areaData);
+    
+        }).catch(e => {
+          console.log(e);
+        });
+
+      });      
+      
 
     }).catch(e => {
       console.log(e);
@@ -73,8 +39,58 @@ function getData(modisURL, viirsURL) {
 
 getData(modisURL, viirsURL);
 
+//////////// CALCULATE ANIMAL DEATHS PER STATE //////////////////
+// Uses general formula described in https://www.bbc.com/news/50986293
+
+// variable to hold calculations, to make later popover
+const deathsByState = [];
+
+function animalDeaths(hectareData, stateName) {
+
+  // reformat numbers for millions of deaths - https://stackoverflow.com/questions/2901102/how-to-print-a-number-with-commas-as-thousands-separators-in-javascript
+  function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  let fireData = Object.entries(hectareData);
+
+  // aggregate "acres burned" by state
+  let burnedInStateSum = 0;
+
+  for (var i = 0; i < fireData[0][1].length; i++) {
+    let datapoint = fireData[0][1][i];
+
+    if (datapoint.state == stateName) {
+      burnedInStateSum += datapoint.area_burned_ha;
+    }
+  }
+
+  // calculate animal death rate by state
+  let hectaresTotal = burnedInStateSum;
+
+  // Estimated number of animals killed per acre
+  const mammals = 17.5;
+  const birds = 20.7;
+  const reptiles = 129.5;
+
+  // multiplied by amount of land hit by fires in each state (hectacreData)
+  let mammalDeaths = Math.round(mammals * hectaresTotal);
+  let birdDeaths = Math.round(birds * hectaresTotal);
+  let reptileDeaths = Math.round(reptiles * hectaresTotal);
+
+  let stateDeaths = {
+    "state": stateName,
+    "mammals": numberWithCommas(mammalDeaths),
+    "birds": numberWithCommas(birdDeaths),
+    "reptiles": numberWithCommas(reptileDeaths)
+  }
+
+  deathsByState.push(stateDeaths);
+
+}
+
 //////////// MAKE THE FEATURES //////////////////
-function makeFeatures(modisData, viirsData, stateData) {
+function makeFeatures(modisData, viirsData, stateData, areaData) {
 
   const modisDataArr = Object.entries(modisData);
   const viirsDataArr = Object.entries(viirsData);
@@ -116,7 +132,7 @@ function makeFeatures(modisData, viirsData, stateData) {
 
   function onEachFeature(feature, layer) {
     L.polyline(feature.geometry.coordinates);
-    acresBurned(feature.properties.STATE_NAME);
+    animalDeaths(areaData, feature.properties.STATE_NAME);
     deathsByState.forEach(state => {
       if (state.state = feature.properties.STATE_NAME) {
         layer.bindPopup("<h3>" + state.state + "</h3>Mammal deaths: " +
@@ -132,15 +148,15 @@ function makeFeatures(modisData, viirsData, stateData) {
   });
 
   // create timeline layer feature
-  let timelineLayer = L.timeline(modisDataArr[0][1], {
-    getInterval: function(datapoint) {
-      return {
-        start: datapoint.acq_time,
-        end: datapoint.acq_time
-      };
-    },
-    pointToLayer: modisHeat
-  });
+  // let timelineLayer = L.timeline(modisDataArr[0][1], {
+  //   getInterval: function(datapoint) {
+  //     return {
+  //       start: datapoint.acq_time,
+  //       end: datapoint.acq_time
+  //     };
+  //   },
+  //   pointToLayer: modisHeat
+  // });
 
   // call makemap function to create the basemap and apply the features
   makeMap(modisHeat, viirsHeat, borders);
@@ -221,6 +237,7 @@ function makeMap(modisHeat, viirsHeat, borders) {
 
 }
 
+// FOR TIMELINE
 // create endpoint that would grab data from MongoDB, create JSON -> GeoJSON and then serve it
 
 // https://stackoverflow.com/questions/55887875/how-to-convert-json-to-geojson
