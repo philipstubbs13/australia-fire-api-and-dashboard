@@ -7,6 +7,7 @@ from flask import (
     redirect)
 from flask_pymongo import PyMongo
 from flask_cors import CORS, cross_origin
+import datetime
 
 app = Flask(__name__)
 CORS(app)
@@ -55,7 +56,6 @@ def data_page():
   data = {'api_base_url': f'{api_base_url}{api_version}' }
   return render_template("data.html", data=data)
 
-# Route for api docs page.
 @app.route(f"/api/{api_version}/docs")
 def api_docs():
     data = {'api_base_url': f'{api_base_url}{api_version}' }
@@ -92,7 +92,7 @@ def fires_modis():
 @cross_origin()
 def fires_viirs():
 
-  data = mongo.db.fires_viirs.find()
+  data = mongo.db.fires_viirs.find().limit(100)
 
   output = []
 
@@ -197,12 +197,40 @@ def aus_temp_rainfall():
   return jsonify({'result' : output})
 
 
-# GET request - get timeseries data
+# GET request - get timeseries data to show number of fires captured by nasa satellites
+# over time during the 2019-20 fire season.
 @app.route(f"/api/{api_version}/fires_time_series", methods=['GET'])
 @cross_origin()
 def fires_time_series():
 
-  data = mongo.db.fires_modis.find()
+  satellite = request.args.get('satellite')
+  time = request.args.get('time')
+  start_date = request.args.get('start_date')
+  end_date = request.args.get('end_date')
+  query_filter = {}
+
+  def validate(date_string):
+    try:
+      datetime.datetime.strptime(date_string, '%Y-%m-%d')
+      is_valid_date = True
+    except ValueError:
+      is_valid_date = False
+    return is_valid_date
+
+  if satellite != None and satellite != 'All':
+    query_filter["satellite"] = satellite
+
+  if time != None and time != 'All':
+    query_filter["daynight"] = time
+
+  if start_date != None and validate(start_date):
+    if validate(end_date) and start_date < end_date:
+      query_filter['acq_date'] = { '$gte' : start_date, '$lte': end_date }
+    else:
+      query_filter['acq_date'] = { '$gte': start_date }
+
+
+  data = mongo.db.fires_modis.find(query_filter)
 
   output = []
 
