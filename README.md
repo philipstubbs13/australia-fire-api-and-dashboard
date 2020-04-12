@@ -28,7 +28,7 @@ The **australia_fire_db** currently has the following collections:
 
 The original datasets/csv files are stored in this repository as a zip file in the [Resources](./Resources) folder.
 
-This repo uses Git LFS to store large dataset files on GitHub. To use this repo, you need to [install Git LFS](https://git-lfs.github.com/).
+This repo uses Git LFS to store the large dataset files on GitHub. To install Git LFS, go [here](https://git-lfs.github.com/).
 
 ## Starting the Flask Server
 

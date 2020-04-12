@@ -203,12 +203,16 @@ def aus_temp_rainfall():
 @cross_origin()
 def fires_time_series():
 
+  # Get the values of the request arguments.
+  # (i.e, these values are what the user selects in the UI).
   satellite = request.args.get('satellite')
   time = request.args.get('time')
   start_date = request.args.get('start_date')
   end_date = request.args.get('end_date')
   query_filter = {}
 
+  # Validate the start date and end date the user chooses to filter by
+  # and verify that they are in the format, 'YYYY-MM-DD'.
   def validate(date_string):
     try:
       datetime.datetime.strptime(date_string, '%Y-%m-%d')
@@ -217,18 +221,22 @@ def fires_time_series():
       is_valid_date = False
     return is_valid_date
 
+  # If querying fires by type of satellite.
   if satellite != None and satellite != 'All':
     query_filter["satellite"] = satellite
 
+  # If querying fires by the time of day.
   if time != None and time != 'All':
     query_filter["daynight"] = time
 
+  # If querying fires on or after a particular date and that date is in the correct format.
   if start_date != None and validate(start_date):
+    # If also querying fires on or before a particular date, that date is in the correct format,
+    # and the start date is before the end date.
     if validate(end_date) and start_date < end_date:
       query_filter['acq_date'] = { '$gte' : start_date, '$lte': end_date }
     else:
       query_filter['acq_date'] = { '$gte': start_date }
-
 
   data = mongo.db.fires_modis.find(query_filter)
 
@@ -249,12 +257,14 @@ def fires_time_series():
       'bright_t31': fire['bright_t31']
     })
 
+  # Create a list of just the dates.
   dates = []
   for fire in output:
     key = 'acq_date'
     if key in fire.keys(): 
       dates.append(fire[key]) 
   
+  # Count how many times each date appears in the list to determine how many fires there were.
   freq = {}
   freq_list = []
   for date in dates: 
@@ -263,6 +273,7 @@ def fires_time_series():
     else: 
       freq[date] = 1
   
+  # Return the data in a format the the d3-timeseries library can used to plot it.
   for key, value in freq.items(): 
     freq_list.append({ 'x': key, 'y': value })
 
