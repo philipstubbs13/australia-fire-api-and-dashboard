@@ -19,6 +19,7 @@
   <div class="container">
     {% block body %}{% endblock %}
   </div>
+  {% include 'includes/_footer.html' %}
 
   <script type="text/javascript">
     const api_base_url = '{{ data.api_base_url }}';
