@@ -11,3 +11,15 @@ code {
   white-space: pre-wrap;
   font-size: 18px;
 }
+
+/* Sticky footer using flexbox */
+/* https://philipwalton.github.io/solved-by-flexbox/demos/sticky-footer/ */
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.container {
+  flex: 1;
+}
