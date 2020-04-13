@@ -166,6 +166,8 @@ function makeFeatures(modisData, viirsData, stateData, areaData) {
   //   pointToLayer: modisHeat
   // });
 
+  // also look at this tutorial for timeline options http://adilmoujahid.com/posts/2015/01/interactive-data-visualization-d3-dc-python-mongodb/
+
   // call makemap function to create the basemap and apply the features
   makeMap(modisHeat, viirsHeat, borders);
   
