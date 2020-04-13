@@ -1,0 +1,29 @@
+<div class="row mb-3">
+  <div class="col-md-12">
+    <h4 class="mt-5 text-center">Number Fires Captured During 2019-2020 Fire Season</h4>
+    <p class="text-center">Chart is built using the <a href="https://github.com/mcaule/d3-timeseries"
+        target="_blank">d3-timeseries</a>
+      charting
+      library by <a href="https://github.com/mcaule" target="_blank">mcaule</a></p>
+  </div>
+  <div class="col-xs-12 col-md-6 time-series-column">
+  </div>
+  <div class="col-xs-12 col-md-6 chart-filters pl-5">
+    <h5 class="mt-4">Time of Day</h5>
+    <select>
+      <option value="All">All</option>
+      <option value="D">Day</option>
+      <option value="N">Night</option>
+    </select>
+    <h5 class="mt-4">Satellite</h5>
+    <select>
+      <option value="All">All</option>
+      <option value="Aqua">Aqua</option>
+      <option value="Terra">Terra</option>
+    </select>
+    <h5 class="mt-4">Start Date</h5>
+    <input class="form-control" id="startDate" type="text" placeholder="2019-08-01" value="" autocomplete="off" />
+    <h5 class="mt-4">End Date</h5>
+    <input class="form-control" id="endDate" type="text" placeholder="2019-11-01" value="" autocomplete="off" />
+  </div>
+</div>

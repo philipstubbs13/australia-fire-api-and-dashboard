@@ -7,6 +7,7 @@ from flask import (
     redirect)
 from flask_pymongo import PyMongo
 from flask_cors import CORS, cross_origin
+import datetime
 
 app = Flask(__name__)
 CORS(app)
@@ -55,7 +56,6 @@ def data_page():
   data = {'api_base_url': f'{api_base_url}{api_version}' }
   return render_template("data.html", data=data)
 
-# Route for api docs page.
 @app.route(f"/api/{api_version}/docs")
 def api_docs():
     data = {'api_base_url': f'{api_base_url}{api_version}' }
@@ -66,7 +66,7 @@ def api_docs():
 @cross_origin()
 def fires_modis():
 
-  data = mongo.db.fires_modis.find()
+  data = mongo.db.fires_modis.find().limit(100)
 
   output = []
 
@@ -92,7 +92,7 @@ def fires_modis():
 @cross_origin()
 def fires_viirs():
 
-  data = mongo.db.fires_viirs.find()
+  data = mongo.db.fires_viirs.find().limit(100)
 
   output = []
 
@@ -195,6 +195,89 @@ def aus_temp_rainfall():
     })
 
   return jsonify({'result' : output})
+
+
+# GET request - get timeseries data to show number of fires captured by nasa satellites
+# over time during the 2019-20 fire season.
+@app.route(f"/api/{api_version}/fires_time_series", methods=['GET'])
+@cross_origin()
+def fires_time_series():
+
+  # Get the values of the request arguments.
+  # (i.e, these values are what the user selects in the UI).
+  satellite = request.args.get('satellite')
+  time = request.args.get('time')
+  start_date = request.args.get('start_date')
+  end_date = request.args.get('end_date')
+  query_filter = {}
+
+  # Validate the start date and end date the user chooses to filter by
+  # and verify that they are in the format, 'YYYY-MM-DD'.
+  def validate(date_string):
+    try:
+      datetime.datetime.strptime(date_string, '%Y-%m-%d')
+      is_valid_date = True
+    except ValueError:
+      is_valid_date = False
+    return is_valid_date
+
+  # If querying fires by type of satellite.
+  if satellite != None and satellite != 'All':
+    query_filter["satellite"] = satellite
+
+  # If querying fires by the time of day.
+  if time != None and time != 'All':
+    query_filter["daynight"] = time
+
+  # If querying fires on or after a particular date and that date is in the correct format.
+  if start_date != None and validate(start_date):
+    # If also querying fires on or before a particular date, that date is in the correct format,
+    # and the start date is before the end date.
+    if validate(end_date) and start_date < end_date:
+      query_filter['acq_date'] = { '$gte' : start_date, '$lte': end_date }
+    else:
+      query_filter['acq_date'] = { '$gte': start_date }
+
+  data = mongo.db.fires_modis.find(query_filter)
+
+  output = []
+
+  for fire in data:
+    output.append({
+      'id': str(fire['_id']),
+      'acq_date': fire['acq_date'],
+      'acq_time': fire['acq_time'],
+      'brightness' : fire['brightness'],
+      'daynight' : fire['daynight'],
+      'frp': fire['frp'],
+      'instrument': fire['instrument'],
+      'latitude': fire['latitude'],
+      'longitude': fire['longitude'],
+      'satellite': fire['satellite'],
+      'bright_t31': fire['bright_t31']
+    })
+
+  # Create a list of just the dates.
+  dates = []
+  for fire in output:
+    key = 'acq_date'
+    if key in fire.keys(): 
+      dates.append(fire[key]) 
+  
+  # Count how many times each date appears in the list to determine how many fires there were.
+  freq = {}
+  freq_list = []
+  for date in dates: 
+    if (date in freq): 
+      freq[date] += 1
+    else: 
+      freq[date] = 1
+  
+  # Return the data in a format the the d3-timeseries library can used to plot it.
+  for key, value in freq.items(): 
+    freq_list.append({ 'x': key, 'y': value })
+
+  return jsonify({'result' : freq_list})
 
 if __name__ == "__main__":
     app.run()
