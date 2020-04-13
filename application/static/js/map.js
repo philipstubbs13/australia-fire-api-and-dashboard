@@ -1,10 +1,7 @@
-// const modisURL = "modis.csv";
 const modisURL = "https://australia-fire-api-dashboard.herokuapp.com/api/v1.0/fires_modis";
 const viirsURL = "https://australia-fire-api-dashboard.herokuapp.com/api/v1.0/fires_viirs";
 const states = "https://raw.githubusercontent.com/rowanhogan/australian-states/master/states.geojson";
 const areaURL = "http://australia-fire-api-dashboard.herokuapp.com/api/v1.0/fires_bystate";
-
-// TODO load in second dataset, create function that allows them to choose which dataset to use
 
 //////////// IMPORT THE DATA //////////////////
 function getData(modisURL, viirsURL) {

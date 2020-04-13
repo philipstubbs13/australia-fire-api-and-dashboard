@@ -7,6 +7,7 @@ from flask import (
     redirect)
 from flask_pymongo import PyMongo
 from flask_cors import CORS, cross_origin
+from config import API_KEY
 
 app = Flask(__name__)
 CORS(app)
@@ -55,6 +56,11 @@ def charts_page():
 def data_page():
   data = {'api_base_url': f'{api_base_url}{api_version}' }
   return render_template("data.html", data=data)
+
+@app.route("/maps")
+def maps_page():
+  data = {'api_base_url': f'{api_base_url}{api_version}' }
+  return render_template("map.html", API_KEY=API_KEY, data=data)
 
 # Route for api docs page.
 @app.route(f"/api/{api_version}/docs")
