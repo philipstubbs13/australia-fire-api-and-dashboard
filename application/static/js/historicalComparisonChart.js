@@ -22,6 +22,20 @@ const chartHeight = svgHeight - margin.top - margin.bottom;
 
 const api_url = `${api_base_url}/fires_historical`;
 
+// Function to populate select dropdown with options.
+const populateFireSelectDropdown = (options, selectElement) => {
+  selectElement
+    .append('option')
+    .attr('value', '')
+    .text('');
+  options.forEach(option =>
+    selectElement
+      .append('option')
+      .attr('value', option.id)
+      .text(option.name),
+  );
+};
+
 const drawHistoricalComparisonChart = () => {
 
   // Choose the initial x-axis and y-axis to display.
@@ -87,6 +101,47 @@ const drawHistoricalComparisonChart = () => {
       data.area_burned_acres = +data.area_burned_acres;
       data.fatalities = +data.fatalities;
       data.homes_destroyed = +data.homes_destroyed;
+    });
+
+    // State to hold the values of the user input fields.
+    let inputValues = {
+      historicalFire: '',
+    };
+
+    // Get the keys of the input elements.
+    const inputKeys = Object.keys(inputValues);
+
+    // Set attributes and styling for the select dropdown elements.
+    d3.select('.historical-chart-filters').selectAll('select').each(function (d, i) {
+      this.setAttribute('class', 'form-control');
+      this.setAttribute('id', inputKeys[i])
+      this.setAttribute('name', inputKeys[i]);
+    });
+
+    // Get select elements
+    const historicalChartFireSelect = d3.select("#historicalFire");
+
+    // Populate dropdown with list of fires.
+    populateFireSelectDropdown(data.result, historicalChartFireSelect);
+
+    // Function that gets fired when value of input changes.
+    d3.select('#historicalFire').on('change', function (event) {
+      const fireToDisplay = data.result.find(fire => fire.id === d3.event.target.value)
+      let singleFireContainer = d3.select('.single-fire-container');
+      singleFireContainer.html('');
+      Object.entries(fireToDisplay).forEach(([key, value]) => {
+        if (key !== "id") {
+          singleFireContainer.append('p')
+            .html(`
+            <span class="font-weight-bold">${key.replace(/_/g, ' ')}: 
+            <span class="font-weight-normal" style="font-size: 16px">${value != null ? value : 'Info Not Available'}</span>
+            <br>
+        `)
+            .style("margin-top", "10px")
+        }
+      });
+
+      (inputValues[d3.event.target.name] = d3.event.target.value)
     });
 
     // Create scale functions.
