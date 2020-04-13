@@ -58,17 +58,12 @@ def data_page():
   data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY }
   return render_template("data.html", data=data)
 
-<<<<<<< HEAD
 @app.route("/map")
 def map_page():
   data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY}
   return render_template("map.html", data=data)
 
 # Route for api docs page.
-||||||| merged common ancestors
-# Route for api docs page.
-=======
->>>>>>> e5ad5bbcf00c607100c6ffe66a8d200da0ff37a5
 @app.route(f"/api/{api_version}/docs")
 def api_docs():
     data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY }
