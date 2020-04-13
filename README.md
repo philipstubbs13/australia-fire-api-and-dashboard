@@ -61,6 +61,16 @@ d3.json(url).then(data => {
 
 Another example can be found [here](./application/static/js/buildDataTable.js).
 
+## Rendering the bushfire map locally
+
+- In order to view the live bushfire map on your own machine, you'll need to save a `config.py` file with a Mapbox API key included in the following format:
+
+```py
+API_KEY = "your key here"
+```
+
+More information on Mapbox API keys can be found on [their website](https://docs.mapbox.com/help/how-mapbox-works/access-tokens/).
+
 ## Deployment
 
 The site is deployed to Heroku, where the API and site are hosted. It is currently hosted at <https://australia-fire-api-dashboard.herokuapp.com/>.
