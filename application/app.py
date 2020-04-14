@@ -8,6 +8,7 @@ from flask import (
 from flask_pymongo import PyMongo
 from flask_cors import CORS, cross_origin
 import datetime
+from app_utils import create_date_filter, validate
 
 try:
     from config import API_KEY
@@ -49,16 +50,6 @@ else:
 
 mongo = PyMongo(app)
 
-# Validate the start date and end date the user chooses to filter by
-# and verify that they are in the format, 'YYYY-MM-DD'.
-def validate(date_string):
-  try:
-    datetime.datetime.strptime(date_string, '%Y-%m-%d')
-    is_valid_date = True
-  except ValueError:
-    is_valid_date = False
-  return is_valid_date
-
 @app.route("/")
 def home_page():
   data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': map_api_key }
@@ -94,16 +85,7 @@ def fires_modis():
   limit = request.args.get('limit')
   start_date = request.args.get('start_date')
   end_date = request.args.get('end_date')
-  query_filter = {}
-
-  # If querying fires on or after a particular date and that date is in the correct format.
-  if start_date != None and validate(start_date):
-    # If also querying fires on or before a particular date, that date is in the correct format,
-    # and the start date is before the end date.
-    if end_date != None and validate(end_date) and start_date < end_date:
-      query_filter['acq_date'] = { '$gte' : start_date, '$lte': end_date }
-    else:
-      query_filter['acq_date'] = { '$gte': start_date }
+  query_filter = create_date_filter(start_date, end_date)
 
   if limit != None:
     limit = int(limit)
@@ -135,7 +117,17 @@ def fires_modis():
 @cross_origin()
 def fires_viirs():
 
-  data = mongo.db.fires_viirs.find().limit(100)
+  # Get the values of the request arguments.
+  limit = request.args.get('limit')
+  start_date = request.args.get('start_date')
+  end_date = request.args.get('end_date')
+  query_filter = create_date_filter(start_date, end_date)
+
+  if limit != None:
+    limit = int(limit)
+    data = mongo.db.fires_viirs.find(query_filter).limit(limit)
+  else:
+    data = mongo.db.fires_viirs.find(query_filter)
 
   output = []
 
@@ -160,7 +152,17 @@ def fires_viirs():
 @cross_origin()
 def fires_modis_geojson():
 
-  data = mongo.db.fires_modis.find()
+  # Get the values of the request arguments.
+  limit = request.args.get('limit')
+  start_date = request.args.get('start_date')
+  end_date = request.args.get('end_date')
+  query_filter = create_date_filter(start_date, end_date)
+
+  if limit != None:
+    limit = int(limit)
+    data = mongo.db.fires_modis.find(query_filter).limit(limit)
+  else:
+    data = mongo.db.fires_modis.find(query_filter)
 
   output = []
 
@@ -193,7 +195,17 @@ def fires_modis_geojson():
 @cross_origin()
 def fires_viirs_geojson():
 
-  data = mongo.db.fires_viirs.find()
+   # Get the values of the request arguments.
+  limit = request.args.get('limit')
+  start_date = request.args.get('start_date')
+  end_date = request.args.get('end_date')
+  query_filter = create_date_filter(start_date, end_date)
+
+  if limit != None:
+    limit = int(limit)
+    data = mongo.db.fires_viirs.find(query_filter).limit(limit)
+  else:
+    data = mongo.db.fires_viirs.find(query_filter)
 
   output = []
 
