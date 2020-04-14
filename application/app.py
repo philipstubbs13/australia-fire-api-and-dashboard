@@ -7,10 +7,12 @@ from flask import (
     redirect)
 from flask_pymongo import PyMongo
 from flask_cors import CORS, cross_origin
+from config import API_KEY
 import datetime
 
 app = Flask(__name__)
 CORS(app)
+app.config['JSON_SORT_KEYS'] = False
 
 # Constants
 is_prod = os.environ.get('DATABASE_USERNAME', '')
@@ -53,22 +55,28 @@ def validate(date_string):
 
 @app.route("/")
 def home_page():
-  data = {'api_base_url': f'{api_base_url}{api_version}' }
+  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY }
   return render_template("home.html", data=data)
 
 @app.route("/charts")
 def charts_page():
-  data = {'api_base_url': f'{api_base_url}{api_version}' }
+  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY }
   return render_template("charts.html", data=data)
 
 @app.route("/data")
 def data_page():
-  data = {'api_base_url': f'{api_base_url}{api_version}' }
+  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY }
   return render_template("data.html", data=data)
 
+@app.route("/map")
+def map_page():
+  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY}
+  return render_template("map.html", data=data)
+
+# Route for api docs page.
 @app.route(f"/api/{api_version}/docs")
 def api_docs():
-    data = {'api_base_url': f'{api_base_url}{api_version}' }
+    data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY }
     return render_template("api_documentation.html", data=data)
 
 # GET request - all the MODIS fires.
@@ -140,6 +148,71 @@ def fires_viirs():
     })
 
   return jsonify({'result' : output})
+
+# GET request - all MODIS fires in GeoJSON format
+@app.route(f"/api/{api_version}/fires_modis_geojson", methods=['GET'])
+@cross_origin()
+def fires_modis_geojson():
+
+  data = mongo.db.fires_modis.find()
+
+  output = []
+
+  for fire in data:
+    output.append({
+      'type': 'Feature',
+      'geometry' : {
+          'type': 'Point',
+          'coordinates': [fire['longitude'], fire['latitude']],
+          },
+      'properties' : {
+        'id': str(fire['_id']),
+        'acq_date': fire['acq_date'],
+        'acq_time': fire['acq_time'],
+        'brightness' : fire['brightness'],
+        'daynight' : fire['daynight'],
+        'frp': fire['frp'],
+        'instrument': fire['instrument'],
+        'satellite': fire['satellite'],
+        'bright_t31': fire['bright_t31']
+      }
+    })
+
+  return jsonify({
+    "type": "FeatureCollection",
+    "features": output})
+
+# GET request - all VIIRS fires in GeoJSON format
+@app.route(f"/api/{api_version}/fires_viirs_geojson", methods=['GET'])
+@cross_origin()
+def fires_viirs_geojson():
+
+  data = mongo.db.fires_viirs.find()
+
+  output = []
+
+  for fire in data:
+    output.append({
+      'type': 'Feature',
+      'geometry' : {
+          'type': 'Point',
+          'coordinates': [fire['longitude'], fire['latitude']],
+          },
+      'properties' : {
+        'id': str(fire['_id']),
+        'acq_date': fire['acq_date'],
+        'acq_time': fire['acq_time'],
+        'bright_ti4' : fire['bright_ti4'],
+        'bright_ti5' : fire['bright_ti5'],
+        'frp': fire['frp'],
+        'instrument': fire['instrument'],
+        'satellite': fire['satellite']
+      }
+    })
+
+  return jsonify({
+    "type": "FeatureCollection",
+    "features": output})
 
 # GET request - all historical/past fires.
 @app.route(f"/api/{api_version}/fires_historical", methods=['GET'])
