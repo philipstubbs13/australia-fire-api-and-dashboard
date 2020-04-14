@@ -1,8 +1,7 @@
-const params = "?start_date=2019-08-01&end_date=2019-08-02"
+const params = "?start_date=2019-08-01&end_date=2019-08-03"
 
 const modisURL = `${api_base_url}/fires_modis_geojson` + params;
-console.log(modisURL);
-const viirsURL = `${api_base_url}/fires_viirs_geojson`;
+const viirsURL = `${api_base_url}/fires_viirs_geojson` + params;
 const states = "https://raw.githubusercontent.com/rowanhogan/australian-states/master/states.geojson";
 const areaURL = `${api_base_url}/fires_bystate`;
 
@@ -10,9 +9,7 @@ const areaURL = `${api_base_url}/fires_bystate`;
 
 //////////// IMPORT THE DATA //////////////////
 function getData(modisURL, viirsURL) {
-  d3.json(modisURL).then(mData => {
-
-    let modisData = mData.features;
+  d3.json(modisURL).then(modisData => {
 
     d3.json(viirsURL).then(vData => {
 
@@ -35,7 +32,6 @@ function getData(modisURL, viirsURL) {
 
     }).catch(e => {
       console.log(e);
-
     });
       
   }).catch(e => {
@@ -104,7 +100,12 @@ function animalDeaths(hectareData, stateName) {
 //////////// MAKE THE FEATURES //////////////////
 function makeFeatures(modisData, viirsData, stateData, areaData) {
 
-  const modisDataArr = Object.entries(modisData);
+  // modisData = geoJSON file needed for timeline layer
+  // modisFeatures = regular JSON to parse for heatmap layer
+  let modisFeatures = modisData.features;
+
+  // parse data for heatmap
+  const modisDataArr = Object.entries(modisFeatures);
   const viirsDataArr = Object.entries(viirsData);
 
   // make heatmaps
@@ -119,8 +120,6 @@ function makeFeatures(modisData, viirsData, stateData, areaData) {
     }
   }
 
-  console.log(modisHeatArray);
-
   let modisHeat = L.heatLayer(modisHeatArray, {
     radius: 20,
     blur: 35
@@ -129,14 +128,10 @@ function makeFeatures(modisData, viirsData, stateData, areaData) {
   for (var i = 0; i < viirsDataArr.length; i++) {
     let datapoint = viirsDataArr[i][1];
 
-    console.log(datapoint);
-
     if (datapoint) {
       viirsHeatArray.push([datapoint.geometry.coordinates[1], datapoint.geometry.coordinates[0], datapoint.properties.bright_ti4]);
     }
   }
-
-  console.log(viirsHeatArray);
 
   let viirsHeat = L.heatLayer(viirsHeatArray, {
     radius: 20,
@@ -168,26 +163,27 @@ function makeFeatures(modisData, viirsData, stateData, areaData) {
   });
 
   // create timeline layer feature
-  let timelineLayer = L.timeline(modisDataArr, {
+  let timelineLayer = L.timeline(modisData, {
     getInterval: function(datapoint) {
       return {
-        start: datapoint.acq_time,
-        end: datapoint.acq_time
+        start: datapoint.properties.acq_date,
+        end: datapoint.properties.acq_date
       };
+    },
+    pointToLayer: function(data, latlng){
+      return L.marker(latlng);
     }
   });
 
-  // https://github.com/socib/Leaflet.TimeDimension - example16.html
-
-  // also look at this tutorial for timeline options http://adilmoujahid.com/posts/2015/01/interactive-data-visualization-d3-dc-python-mongodb/
+  console.log(timelineLayer);
 
   // call makemap function to create the basemap and apply the features
-  makeMap(modisHeat, viirsHeat, borders);
+  makeMap(modisHeat, viirsHeat, borders, timelineLayer);
   
 }
 
 //////////// CREATE THE MAP //////////////////
-function makeMap(modisHeat, viirsHeat, borders) {
+function makeMap(modisHeat, viirsHeat, borders, timelineLayer) {
   // Define map style option layers
 
   let satellite = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
@@ -212,18 +208,22 @@ function makeMap(modisHeat, viirsHeat, borders) {
 
   // Define overlayMaps for marker layers
   let overlayMaps = {
-    "States": borders,
+    "State losses (total)": borders,
     "Fire intensity (MODIS)": modisHeat,
-    "Fire intensity (VIIRS)": viirsHeat
+    "Fire intensity (VIIRS)": viirsHeat,
+    "Timeline (dates)": timelineLayer
   };
 
   var timelineControl = L.timelineSliderControl({
+    start: 2019-08-01,
+    end: 2019-08-03,
     formatOutput: function(date) {
-      return new Date(date).toString();
-    }
+      return date.toString();
+    },
+    enablePlayback: true,
+    waitToUpdateMap: false
   });
 
-  // create a slider for date data (to see changes by day) https://digital-geography.com/filter-leaflet-maps-slider/
 
   // Create a layer control
   let layerControl = L.control.layers(baseMaps, overlayMaps, {
@@ -239,11 +239,11 @@ function makeMap(modisHeat, viirsHeat, borders) {
     layers: [outdoors, modisHeat] // TODO Add in features here
   });
 
-  // Add legend to the map
+  // Add legend to the map that describes how to interact and what data is in the different layers
   // legend.addTo(myMap);
   // Add layer control to the map
   layerControl.addTo(myMap);
-  timelineControl.addTo(map);
-  timelineControl.addTimelines(timelineLayer);
-  timelineLayer.addTo(map);
+  // timelineControl.addTo(map);
+  // timelineControl.addTimelines(timelineLayer);
+  // timelineLayer.addTo(map);
 }
