@@ -7,10 +7,12 @@ from flask import (
     redirect)
 from flask_pymongo import PyMongo
 from flask_cors import CORS, cross_origin
+from config import API_KEY
 import datetime
 
 app = Flask(__name__)
 CORS(app)
+app.config['JSON_SORT_KEYS'] = False
 
 # Constants
 is_prod = os.environ.get('DATABASE_USERNAME', '')
@@ -22,7 +24,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 # No more page caching/need to hard refresh.
 # Still need to soft refresh the page though when making changes to static files...
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0 
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 # If this app is on production/deployed to heroku.
 if is_prod:
@@ -41,24 +43,40 @@ else:
 
 mongo = PyMongo(app)
 
+# Validate the start date and end date the user chooses to filter by
+# and verify that they are in the format, 'YYYY-MM-DD'.
+def validate(date_string):
+  try:
+    datetime.datetime.strptime(date_string, '%Y-%m-%d')
+    is_valid_date = True
+  except ValueError:
+    is_valid_date = False
+  return is_valid_date
+
 @app.route("/")
 def home_page():
-  data = {'api_base_url': f'{api_base_url}{api_version}' }
+  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY }
   return render_template("home.html", data=data)
 
 @app.route("/charts")
 def charts_page():
-  data = {'api_base_url': f'{api_base_url}{api_version}' }
+  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY }
   return render_template("charts.html", data=data)
 
 @app.route("/data")
 def data_page():
-  data = {'api_base_url': f'{api_base_url}{api_version}' }
+  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY }
   return render_template("data.html", data=data)
 
+@app.route("/map")
+def map_page():
+  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY}
+  return render_template("map.html", data=data)
+
+# Route for api docs page.
 @app.route(f"/api/{api_version}/docs")
 def api_docs():
-    data = {'api_base_url': f'{api_base_url}{api_version}' }
+    data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY }
     return render_template("api_documentation.html", data=data)
 
 # GET request - all the MODIS fires.
@@ -66,7 +84,26 @@ def api_docs():
 @cross_origin()
 def fires_modis():
 
-  data = mongo.db.fires_modis.find().limit(100)
+  # Get the values of the request arguments.
+  limit = request.args.get('limit')
+  start_date = request.args.get('start_date')
+  end_date = request.args.get('end_date')
+  query_filter = {}
+
+  # If querying fires on or after a particular date and that date is in the correct format.
+  if start_date != None and validate(start_date):
+    # If also querying fires on or before a particular date, that date is in the correct format,
+    # and the start date is before the end date.
+    if end_date != None and validate(end_date) and start_date < end_date:
+      query_filter['acq_date'] = { '$gte' : start_date, '$lte': end_date }
+    else:
+      query_filter['acq_date'] = { '$gte': start_date }
+
+  if limit != None:
+    limit = int(limit)
+    data = mongo.db.fires_modis.find(query_filter).limit(limit)
+  else:
+    data = mongo.db.fires_modis.find(query_filter)
 
   output = []
 
@@ -111,6 +148,71 @@ def fires_viirs():
     })
 
   return jsonify({'result' : output})
+
+# GET request - all MODIS fires in GeoJSON format
+@app.route(f"/api/{api_version}/fires_modis_geojson", methods=['GET'])
+@cross_origin()
+def fires_modis_geojson():
+
+  data = mongo.db.fires_modis.find()
+
+  output = []
+
+  for fire in data:
+    output.append({
+      'type': 'Feature',
+      'geometry' : {
+          'type': 'Point',
+          'coordinates': [fire['longitude'], fire['latitude']],
+          },
+      'properties' : {
+        'id': str(fire['_id']),
+        'acq_date': fire['acq_date'],
+        'acq_time': fire['acq_time'],
+        'brightness' : fire['brightness'],
+        'daynight' : fire['daynight'],
+        'frp': fire['frp'],
+        'instrument': fire['instrument'],
+        'satellite': fire['satellite'],
+        'bright_t31': fire['bright_t31']
+      }
+    })
+
+  return jsonify({
+    "type": "FeatureCollection",
+    "features": output})
+
+# GET request - all VIIRS fires in GeoJSON format
+@app.route(f"/api/{api_version}/fires_viirs_geojson", methods=['GET'])
+@cross_origin()
+def fires_viirs_geojson():
+
+  data = mongo.db.fires_viirs.find()
+
+  output = []
+
+  for fire in data:
+    output.append({
+      'type': 'Feature',
+      'geometry' : {
+          'type': 'Point',
+          'coordinates': [fire['longitude'], fire['latitude']],
+          },
+      'properties' : {
+        'id': str(fire['_id']),
+        'acq_date': fire['acq_date'],
+        'acq_time': fire['acq_time'],
+        'bright_ti4' : fire['bright_ti4'],
+        'bright_ti5' : fire['bright_ti5'],
+        'frp': fire['frp'],
+        'instrument': fire['instrument'],
+        'satellite': fire['satellite']
+      }
+    })
+
+  return jsonify({
+    "type": "FeatureCollection",
+    "features": output})
 
 # GET request - all historical/past fires.
 @app.route(f"/api/{api_version}/fires_historical", methods=['GET'])
@@ -191,7 +293,9 @@ def aus_temp_rainfall():
       'id': str(fire['_id']),
       'year': fire['Year'],
       'avg_annual_temp': fire['Avg Annual Temp'],
-      'avg_annual_rainfall' : fire['Avg Annual Rainfall']
+      'avg_annual_rainfall' : fire['Avg Annual Rainfall'],
+      'temp_difference': fire['temp_difference'],
+      'rainfall_difference': fire['rainfall_difference']
     })
 
   return jsonify({'result' : output})
@@ -210,16 +314,6 @@ def fires_time_series():
   start_date = request.args.get('start_date')
   end_date = request.args.get('end_date')
   query_filter = {}
-
-  # Validate the start date and end date the user chooses to filter by
-  # and verify that they are in the format, 'YYYY-MM-DD'.
-  def validate(date_string):
-    try:
-      datetime.datetime.strptime(date_string, '%Y-%m-%d')
-      is_valid_date = True
-    except ValueError:
-      is_valid_date = False
-    return is_valid_date
 
   # If querying fires by type of satellite.
   if satellite != None and satellite != 'All':
