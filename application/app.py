@@ -334,7 +334,7 @@ def aus_temp_rainfall():
       'year': fire['Year'],
       'avg_annual_temp': fire['Avg Annual Temp'],
       'avg_annual_rainfall' : fire['Avg Annual Rainfall'],
-      'temp_difference': fire['temp_difference'],
+      'temp_difference': fire['temp_differnce'],
       'rainfall_difference': fire['rainfall_difference']
     })
 
@@ -395,20 +395,20 @@ def fires_time_series():
   dates = []
   for fire in output:
     key = 'acq_date'
-    if key in fire.keys(): 
-      dates.append(fire[key]) 
-  
+    if key in fire.keys():
+      dates.append(fire[key])
+
   # Count how many times each date appears in the list to determine how many fires there were.
   freq = {}
   freq_list = []
-  for date in dates: 
-    if (date in freq): 
+  for date in dates:
+    if (date in freq):
       freq[date] += 1
-    else: 
+    else:
       freq[date] = 1
-  
+
   # Return the data in a format the the d3-timeseries library can used to plot it.
-  for key, value in freq.items(): 
+  for key, value in freq.items():
     freq_list.append({ 'x': key, 'y': value })
 
   return jsonify({'result' : freq_list})
