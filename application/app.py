@@ -24,7 +24,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 # No more page caching/need to hard refresh.
 # Still need to soft refresh the page though when making changes to static files...
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0 
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 # If this app is on production/deployed to heroku.
 if is_prod:
@@ -293,7 +293,9 @@ def aus_temp_rainfall():
       'id': str(fire['_id']),
       'year': fire['Year'],
       'avg_annual_temp': fire['Avg Annual Temp'],
-      'avg_annual_rainfall' : fire['Avg Annual Rainfall']
+      'avg_annual_rainfall' : fire['Avg Annual Rainfall'],
+      'temp_difference': fire['temp_difference'],
+      'rainfall_difference': fire['rainfall_difference']
     })
 
   return jsonify({'result' : output})
