@@ -7,8 +7,12 @@ from flask import (
     redirect)
 from flask_pymongo import PyMongo
 from flask_cors import CORS, cross_origin
-from config import API_KEY
 import datetime
+
+try:
+    from config import API_KEY
+except ImportError:
+    config = None
 
 app = Flask(__name__)
 CORS(app)
