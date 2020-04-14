@@ -10,8 +10,8 @@ body,
 html {
   height: 100%;
 }
+/* 
 
-/* set legend style */
 .legend {
   padding: 6px 8px;
   font: 12px Arial, Helvetica, sans-serif;
@@ -37,5 +37,5 @@ html {
 
 .legend li .legendText {
   margin-left: 5px;
-}
+} */
 

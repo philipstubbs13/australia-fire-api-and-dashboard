@@ -1,8 +1,10 @@
-const modisURL = `${api_base_url}/fires_modis`;
+const params = "?start_date=2019-12-01&end_date=2019-12-31"
+
+const modisURL = `${api_base_url}/fires_modis` + params;
 const viirsURL = `${api_base_url}/fires_viirs`;
 const states = "https://raw.githubusercontent.com/rowanhogan/australian-states/master/states.geojson";
 const areaURL = `${api_base_url}/fires_bystate`;
-
+console.log(modisURL);
 // add loading spinner while data is fetched, before d3.json https://github.com/makinacorpus/Leaflet.Spin
 
 //////////// IMPORT THE DATA //////////////////

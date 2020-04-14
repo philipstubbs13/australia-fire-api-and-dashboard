@@ -1,6 +1,8 @@
 */config.py
 .ipynb_checkpoints
 *.csv
+.DS_Store
+templates/.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
