@@ -9,21 +9,28 @@
     integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css')}}" />
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/d3ChartStyles.css')}}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/d3_timeseries.min.css')}}" />
+
   <title>Australia Fires</title>
 </head>
 
 <body>
+
   {% include 'includes/_navbar.html' %}
+  
   <div class="container">
     {% block body %}{% endblock %}
   </div>
+  {% include 'includes/_footer.html' %}
 
   <script type="text/javascript">
     const api_base_url = '{{ data.api_base_url }}';
   </script>
+
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.9.1/d3-tip.min.js"
     integrity="sha256-DCW2G+HXRTaX80n/cuqXdLtWpE59kVHmSBzwPRBHe/o=" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static', filename='js/d3_timeseries.min.js') }}"></script>
   <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
     integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
     crossorigin="anonymous"></script>
@@ -35,6 +42,7 @@
     crossorigin="anonymous"></script>
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
   <script src="{{ url_for('static', filename='js/historicalComparisonChart.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/fireTimeSeries.js') }}"></script>
   <script src="{{ url_for('static', filename='js/buildDataTable.js') }}"></script>
   <script src="{{ url_for('static', filename='js/currentSeasonDevastationChart.js') }}"></script>
 </body>
