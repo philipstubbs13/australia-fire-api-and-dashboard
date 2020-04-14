@@ -1,17 +1,22 @@
-const params = "?start_date=2019-12-01&end_date=2019-12-31"
+const params = "?start_date=2019-08-01&end_date=2019-08-02"
 
-const modisURL = `${api_base_url}/fires_modis` + params;
-const viirsURL = `${api_base_url}/fires_viirs`;
+const modisURL = `${api_base_url}/fires_modis_geojson` + params;
+console.log(modisURL);
+const viirsURL = `${api_base_url}/fires_viirs_geojson`;
 const states = "https://raw.githubusercontent.com/rowanhogan/australian-states/master/states.geojson";
 const areaURL = `${api_base_url}/fires_bystate`;
-console.log(modisURL);
+
 // add loading spinner while data is fetched, before d3.json https://github.com/makinacorpus/Leaflet.Spin
 
 //////////// IMPORT THE DATA //////////////////
 function getData(modisURL, viirsURL) {
-  d3.json(modisURL).then(modisData => {
+  d3.json(modisURL).then(mData => {
 
-    d3.json(viirsURL).then(viirsData => {
+    let modisData = mData.features;
+
+    d3.json(viirsURL).then(vData => {
+
+      let viirsData = vData.features;
 
       d3.json(areaURL).then(areaData => {
 
@@ -106,26 +111,32 @@ function makeFeatures(modisData, viirsData, stateData, areaData) {
   let modisHeatArray = [];
   let viirsHeatArray = [];
 
-  for (var i = 0; i < modisDataArr[0][1].length; i++) {
-    let datapoint = modisDataArr[0][1][i];
+  for (var i = 0; i < modisDataArr.length; i++) {
+    let datapoint = modisDataArr[i][1];
 
     if (datapoint) {
-      modisHeatArray.push([datapoint.latitude, datapoint.longitude, datapoint.brightness]);
+      modisHeatArray.push([datapoint.geometry.coordinates[1], datapoint.geometry.coordinates[0], datapoint.properties.brightness]);
     }
   }
+
+  console.log(modisHeatArray);
 
   let modisHeat = L.heatLayer(modisHeatArray, {
     radius: 20,
     blur: 35
   });
 
-  for (var i = 0; i < viirsDataArr[0][1].length; i++) {
-    let datapoint = viirsDataArr[0][1][i];
+  for (var i = 0; i < viirsDataArr.length; i++) {
+    let datapoint = viirsDataArr[i][1];
+
+    console.log(datapoint);
 
     if (datapoint) {
-      viirsHeatArray.push([datapoint.latitude, datapoint.longitude, datapoint.bright_ti4]);
+      viirsHeatArray.push([datapoint.geometry.coordinates[1], datapoint.geometry.coordinates[0], datapoint.properties.bright_ti4]);
     }
   }
+
+  console.log(viirsHeatArray);
 
   let viirsHeat = L.heatLayer(viirsHeatArray, {
     radius: 20,
@@ -157,15 +168,16 @@ function makeFeatures(modisData, viirsData, stateData, areaData) {
   });
 
   // create timeline layer feature
-  // let timelineLayer = L.timeline(modisDataArr[0][1], {
-  //   getInterval: function(datapoint) {
-  //     return {
-  //       start: datapoint.acq_time,
-  //       end: datapoint.acq_time
-  //     };
-  //   },
-  //   pointToLayer: modisHeat
-  // });
+  let timelineLayer = L.timeline(modisDataArr, {
+    getInterval: function(datapoint) {
+      return {
+        start: datapoint.acq_time,
+        end: datapoint.acq_time
+      };
+    }
+  });
+
+  // https://github.com/socib/Leaflet.TimeDimension - example16.html
 
   // also look at this tutorial for timeline options http://adilmoujahid.com/posts/2015/01/interactive-data-visualization-d3-dc-python-mongodb/
 
@@ -205,25 +217,11 @@ function makeMap(modisHeat, viirsHeat, borders) {
     "Fire intensity (VIIRS)": viirsHeat
   };
 
-  // // Create a legend
-  // var legend = L.control({ position: "bottomright" });
-
-  // legend.onAdd = function() {
-  //   var div = L.DomUtil.create("div", "info legend");
-  //   var limits = ["0-1", "1-2", "2-3", "3-4", "4-5", "5+"];
-  //   var labels = [];      
-
-  //   div.innerHTML = "<div class=\"labels\"></div>";
-
-  //   limits.forEach(function(limit, index) {
-
-  //     var colors = ["#c4f069", "#e5f16a", "#efdb67", "#eabb61", "#e5a975", "#e0736f"]
-  //     labels.push(`<li style=\"background-color: ${colors[index]};\"><span class=\"legendText\">${limits[index]}</span></li>`);
-  //   }); // TODO: Get numbers to appear alongside color boxes
-
-  //   div.innerHTML += "<ul>" + labels.join("") + "</ul>";
-  //   return div;
-  // };
+  var timelineControl = L.timelineSliderControl({
+    formatOutput: function(date) {
+      return new Date(date).toString();
+    }
+  });
 
   // create a slider for date data (to see changes by day) https://digital-geography.com/filter-leaflet-maps-slider/
 
@@ -245,10 +243,7 @@ function makeMap(modisHeat, viirsHeat, borders) {
   // legend.addTo(myMap);
   // Add layer control to the map
   layerControl.addTo(myMap);
-
+  timelineControl.addTo(map);
+  timelineControl.addTimelines(timelineLayer);
+  timelineLayer.addTo(map);
 }
-
-// FOR TIMELINE
-// create endpoint that would grab data from MongoDB, create JSON -> GeoJSON and then serve it
-
-// https://stackoverflow.com/questions/55887875/how-to-convert-json-to-geojson
