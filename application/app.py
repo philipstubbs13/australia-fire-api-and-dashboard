@@ -49,8 +49,6 @@ else:
 
 mongo = PyMongo(app)
 
-import datetime
-
 # Validate the start date and end date the user chooses to filter by
 # and verify that they are in the format, 'YYYY-MM-DD'.
 def validate(date_string):
