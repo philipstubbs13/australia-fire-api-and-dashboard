@@ -1,7 +1,9 @@
-const modisURL = "https://australia-fire-api-dashboard.herokuapp.com/api/v1.0/fires_modis";
-const viirsURL = "https://australia-fire-api-dashboard.herokuapp.com/api/v1.0/fires_viirs";
+const modisURL = `${api_base_url}/fires_modis`;
+const viirsURL = `${api_base_url}/fires_viirs`;
 const states = "https://raw.githubusercontent.com/rowanhogan/australian-states/master/states.geojson";
-const areaURL = "http://australia-fire-api-dashboard.herokuapp.com/api/v1.0/fires_bystate";
+const areaURL = `${api_base_url}/fires_bystate`;
+
+// add loading spinner while data is fetched, before d3.json https://github.com/makinacorpus/Leaflet.Spin
 
 //////////// IMPORT THE DATA //////////////////
 function getData(modisURL, viirsURL) {
