@@ -35,11 +35,13 @@ if is_prod:
   db_name = os.environ.get('DB_NAME', '')
   app.config['MONGO_URI'] = mongo_uri
   app.config['MONGO_DBNAME'] = db_name
+  map_api_key = os.environ.get('MAP_API_KEY', '')
 # else if you are running the app locally.
 else:
   app.debug = True
   db_name = 'australia_fire_db'
   app.config['MONGO_URI'] = f'mongodb://localhost:27017/{db_name}'
+  map_api_key = API_KEY
 
 mongo = PyMongo(app)
 
@@ -55,28 +57,28 @@ def validate(date_string):
 
 @app.route("/")
 def home_page():
-  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY }
+  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': map_api_key }
   return render_template("home.html", data=data)
 
 @app.route("/charts")
 def charts_page():
-  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY }
+  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': map_api_key }
   return render_template("charts.html", data=data)
 
 @app.route("/data")
 def data_page():
-  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY }
+  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': map_api_key }
   return render_template("data.html", data=data)
 
 @app.route("/map")
 def map_page():
-  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY}
+  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': map_api_key}
   return render_template("map.html", data=data)
 
 # Route for api docs page.
 @app.route(f"/api/{api_version}/docs")
 def api_docs():
-    data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY }
+    data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': map_api_key }
     return render_template("api_documentation.html", data=data)
 
 # GET request - all the MODIS fires.
