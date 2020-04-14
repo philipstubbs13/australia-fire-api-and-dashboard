@@ -130,7 +130,7 @@ const drawHistoricalComparisonChart = () => {
       let singleFireContainer = d3.select('.single-fire-container');
       singleFireContainer.html('');
       Object.entries(fireToDisplay).forEach(([key, value]) => {
-        if (key !== "id") {
+        if (key !== "id" && key !== "name") {
           singleFireContainer.append('p')
             .html(`
             <span class="font-weight-bold">${key.replace(/_/g, ' ')}: 
