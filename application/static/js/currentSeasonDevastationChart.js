@@ -159,8 +159,7 @@ d3.json(bystate_url).then((data, err) => {
         .attr("x", (d, i) => xScale(states[i]))
         .attr("y", (d, i) => yScale(burnarea[i]))
         .attr("width", d => xScale.bandwidth())
-        .attr("height", d => bystatechartHeight - yScale(d))
-        .attr("opacity", ".75");
+        .attr("height", d => bystatechartHeight - yScale(d));
 
     // axis labels
     chartGroup.append("text")
@@ -168,7 +167,7 @@ d3.json(bystate_url).then((data, err) => {
         .attr("x", 0)
         .attr("y", 20)
         .classed("active", true)
-        .text("State/Territory");
+        .text("State");
 
     chartGroup.append("text")
         .attr("transform", "rotate(-90)")
@@ -176,6 +175,6 @@ d3.json(bystate_url).then((data, err) => {
         .attr("x", 0 - (bystatechartHeight / 2))
         .attr("dy", "1em")
         .classed("active", true)
-        .text("Area Burned (hectares)")
+        .text("Area Burned (hecares)")
 });
 
