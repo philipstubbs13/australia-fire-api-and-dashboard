@@ -30,49 +30,57 @@ var svgbystate = d3.select("#bushfire-devastation-chart")
 var chartGroup = svgbystate.append("g")
     .attr("transform", `translate(${marginbystate.left}, ${marginbystate.top})`);
 
-var chosenXAxis = "area_burned_ha";
+var chosenYAxis = "area_burned_ha";
 
 // scale x to chart width
 // may need to update how data is pulled here
-function xScale(filteredData, chosenXAxis) {
-    var xscaleBand = d3.scaleBand()
-        .domain(filteredData, d => d[chosenXAxis])
-        .range([0, bystatechartWidth])
-        .padding(0.1);
+function yDevastationScale(filteredData, chosenYAxis) {
+    var yLinearScale = d3.scaleLinear()
+        .domain([0, d3.max(filteredData, d => d[chosenYAxis]) * 1.2])
+        .range([bystatechartHeight, 0]);
+        // .padding(0.1);
 
-    return xscaleBand;
+    return yLinearScale;
 }
+
+    // scale y to chart height
+    // need to make this dynamic but have a preset chart
+    // var yScale = d3.scaleLinear()
+    //     .domain([0, d3.max(burnarea)])
+    //     .range([bystatechartHeight, 0]);
+
+    // var yAxis = d3.axisLeft(yScale);
 
 // create axes
 // var xAxis = d3.axisBottom(xScale);
-function renderAxes(newxScale, xAxis) {
-    var bottomAxis = d3.axisBottom(newxScale);
+function renderAxes(newyScale, yAxis) {
+    var leftAxis = d3.axisLeft(newyScale);
 
-    xAxis.transition()
+    yAxis.transition()
         .duration(1000)
-        .call(bottomAxis);
+        .call(leftAxis);
 
-    return xAxis;
+    return yAxis;
 }
 
 // update rectangles group with transition
 // may need to update how data is pulled here
-function renderRectangles(rectGroup, newxScale, chosenXAxis) {
+function renderRectangles(rectGroup, newyScale, chosenYAxis) {
     rectGroup.transition()
         .duration(1000)
-        .attr("x", d => newxScale(d[chosenXAxis]));
+        .attr("y", d => newyScale(d[chosenYAxis]));
 
     return rectGroup;
 }
 
 // d3 tool tip
-function updateToolTip(chosenXAxis, rectGroup) {
+function updateDevastationToolTip(chosenYAxis, rectGroup, statelist) {
     var label;
 
-    if (chosenXAxis === "area_burned_ha") {
+    if (chosenYAxis === "area_burned_ha") {
         label = "Area Burned (hectares):";
     }
-    else if (chosenXAxis === "homeslost") {
+    else if (chosenYAxis === "homeslost") {
         label = "Homes Lost:";
     }
     else {
@@ -82,8 +90,8 @@ function updateToolTip(chosenXAxis, rectGroup) {
     var toolTip = d3.tip()
         .attr("class", "d3-tip")
         .offset([80, -60])
-        .html(function(d) {
-            return(`${d.state}<br>${label} ${d[chosenXAxis]}`);
+        .html(function(d, i) {
+            return(`${d[state]}<br>${label} ${d[chosenYAxis]}`);
         });
 
     rectGroup.call(toolTip);
@@ -92,7 +100,7 @@ function updateToolTip(chosenXAxis, rectGroup) {
         toolTip.show(data);
     })
         .on("mouseout", function(data, index) {
-            toolTip.hid(data);
+            toolTip.hide(data);
         });
 
     return rectGroup;
@@ -106,7 +114,7 @@ d3.json(bystate_url).then((data, err) => {
     
     // add a JS.filter() to remove the last row of total of all results
     filteredData = data.result.filter(d => d.state != 'Total');
-    console.log(filteredData);
+    console.log(filteredData.map(d => d.state));
 
     // Parse data/cast as numbers.
     filteredData.forEach((data) => {
@@ -116,26 +124,26 @@ d3.json(bystate_url).then((data, err) => {
     });
 
     // use the xScale function above
-    var xBanScale = xScale(filteredData.result, chosenXAxis);
+    // var xBanScale = xScale(filteredData.result, chosenXAxis);
 
     // create variables for each data set
-    // var states = filteredData.map(d => d.state);
-    // var burnarea = filteredData.map(d => d.area_burned_ha);
+    var state = filteredData.map(d => d.state);
+    // var area_burned_ha = filteredData.map(d => d.area_burned_ha);
+    // var homeslost = filteredData.map(d => d.homeslost);
+    // var fatalities = filteredData.map(d => d.fatalities);
 
-    // scale y to chart height
-    // need to make this dynamic but have a preset chart
-    var yScale = d3.scaleLinear()
-        .domain([0, d3.max(burnarea)])
-        .range([bystatechartHeight, 0]);
+    var xScale = d3.scaleBand()
+        .domain(state)
+        .range([0, bystatechartWidth])
+        .padding(0.1);
 
-    var yAxis = d3.axisLeft(yScale);
+    var xAxis = d3.axisBottom(xScale);
 
-
-
-
+    var yLinearScale = yDevastationScale(filteredData, chosenYAxis);
+    var yAxis = d3.axisLeft(yLinearScale);
 
     // set x to the bottom of the chart
-    chartGroup.append("g")
+    var leftAxis = chartGroup.append("g")
         .attr("transform", `translate(0, ${bystatechartHeight})`)
         .call(xAxis)
         .selectAll("text")	
@@ -150,18 +158,46 @@ d3.json(bystate_url).then((data, err) => {
     chartGroup.append("g")
         .call(yAxis);
     
-    // create the bar chart
-    chartGroup.selectAll("rect")
-        .data(burnarea)
+    // append initial rectangles
+    var rectGroup = chartGroup.selectAll("rect")
+        .data(filteredData)
         .enter()
         .append("rect")
         // .classed("")
-        .attr("x", (d, i) => xScale(states[i]))
-        .attr("y", (d, i) => yScale(burnarea[i]))
-        .attr("width", d => xScale.bandwidth())
-        .attr("height", d => bystatechartHeight - yScale(d));
+        .attr("x", (d, i) => xScale(state[i]))
+        .attr("y", (d, i) => yLinearScale(d[chosenYAxis]))
+        .attr("width", xScale.bandwidth())
+        .attr("height", d => bystatechartHeight - yLinearScale(d[chosenYAxis]));
 
-    // axis labels
+    // 3 y axis labels
+    var labelsGroup = chartGroup.append("g")
+        .attr("transform", "rotate(-90)");
+
+    var areaLabel = labelsGroup.append("text")
+        .attr("y", 0 - marginbystate.left + 65)
+        .attr("x", 0 - (bystatechartHeight / 2))
+        .attr("dy", "1em")
+        .attr("value", "area_burned_ha")
+        .classed("active", true)
+        .text("Area Burned (hectares)");
+
+    var homesLabel = labelsGroup.append("text")
+        .attr("y", 0 - marginbystate.left + 25)
+        .attr("x", 0 - (bystatechartHeight / 2))
+        .attr("dy", "1em")
+        .attr("value", "homeslost")
+        .classed("inactive", true)
+        .text("Homes Destroyed");
+
+    var fatalitiesLabel = labelsGroup.append("text")
+        .attr("y", 0 - marginbystate.left + 45)
+        .attr("x", 0 - (bystatechartHeight / 2))
+        .attr("dy", "1em")
+        .attr("value", "fatalities")
+        .classed("inactive", true)
+        .text("Fatalities");  
+
+    // append x axis label
     chartGroup.append("text")
         .attr("transform", `translate(${bystatechartWidth / 2}, ${bystatechartHeight + 80})`)
         .attr("x", 0)
@@ -169,12 +205,70 @@ d3.json(bystate_url).then((data, err) => {
         .classed("active", true)
         .text("State");
 
-    chartGroup.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 0 - marginbystate.left + 70)
-        .attr("x", 0 - (bystatechartHeight / 2))
-        .attr("dy", "1em")
-        .classed("active", true)
-        .text("Area Burned (hecares)")
+
+    // chartGroup.append("text")
+    //     .attr("transform", "rotate(-90)")
+        // .attr("y", 0 - marginbystate.left + 70)
+        // .attr("x", 0 - (bystatechartHeight / 2))
+        // .attr("dy", "1em")
+    //     .classed("active", true)
+    //     .text("Area Burned (hectares)")
+
+    // updateDevastationToolTip from function above on json import
+    var rectGroup = updateDevastationToolTip(chosenYAxis, rectGroup, state);
+
+    // y axis label event listener
+    labelsGroup.selectAll("text")
+        .on("click", function() {
+            // get value of section
+            var value = d3.select(this).attr("value");
+            if (value != chosenYAxis) {
+                chosenYAxis = value;
+                console.log(chosenYAxis);
+
+                yLinearScale = yDevastationScale(filteredData, chosenYAxis);
+
+                leftAxis = renderAxes(yLinearScale, leftAxis);
+
+                rectGroup = renderRectangles(rectGroup, yLinearScale, chosenYAxis);
+
+                rectGroup = updateDevastationToolTip(chosenYAxis, rectGroup);
+
+                // chages classes to change bold text
+                if (chosenYAxis === "area_burned_ha") {
+                    areaLabel
+                        .classed("active", true)
+                        .classed("inactive", false);
+                    homesLabel
+                        .classed("acitve", false)
+                        .classed("inactive", true);
+                    fatalitiesLabel
+                        .classed("acitve", false)
+                        .classed("inactive", true);
+                }
+                else if (chosenYAxis === "homeslost") {
+                    areaLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    homesLabel
+                        .classed("acitve", true)
+                        .classed("inactive", false);
+                    fatalitiesLabel
+                        .classed("acitve", false)
+                        .classed("inactive", true);
+                }
+                else {
+                    areaLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    homesLabel
+                        .classed("acitve", false)
+                        .classed("inactive", true);
+                    fatalitiesLabel
+                        .classed("acitve", true)
+                        .classed("inactive", false);
+                }
+            }
+        });
 });
 
