@@ -91,15 +91,15 @@ function updateDevastationToolTip(chosenYAxis, rectGroup, statelist) {
         .offset([80, -60])
         .html(function(d, i) {
             return(`
-            State: ${d.state}<br>
+            State: ${statelist[i]}<br>
             ${label} ${d[chosenYAxis]}
             `);
         });
 
     rectGroup.call(toolTip);
 
-    rectGroup.on("mouseover", function(d) {
-        toolTip.show(d);
+    rectGroup.on("mouseover", function(d, i) {
+        toolTip.show(d, this);
     })
         .on("mouseout", function(data, index) {
             toolTip.hide(data);
