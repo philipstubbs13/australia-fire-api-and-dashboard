@@ -30,12 +30,79 @@ var svgbystate = d3.select("#bushfire-devastation-chart")
 var chartGroup = svgbystate.append("g")
     .attr("transform", `translate(${marginbystate.left}, ${marginbystate.top})`);
 
+var chosenXAxis = "area_burned_ha";
+
+// scale x to chart width
+// may need to update how data is pulled here
+function xScale(filteredData, chosenXAxis) {
+    var xscaleBand = d3.scaleBand()
+        .domain(filteredData, d => d[chosenXAxis])
+        .range([0, bystatechartWidth])
+        .padding(0.1);
+
+    return xscaleBand;
+}
+
+// create axes
+// var xAxis = d3.axisBottom(xScale);
+function renderAxes(newxScale, xAxis) {
+    var bottomAxis = d3.axisBottom(newxScale);
+
+    xAxis.transition()
+        .duration(1000)
+        .call(bottomAxis);
+
+    return xAxis;
+}
+
+// update rectangles group with transition
+// may need to update how data is pulled here
+function renderRectangles(rectGroup, newxScale, chosenXAxis) {
+    rectGroup.transition()
+        .duration(1000)
+        .attr("x", d => newxScale(d[chosenXAxis]));
+
+    return rectGroup;
+}
+
+// d3 tool tip
+function updateToolTip(chosenXAxis, rectGroup) {
+    var label;
+
+    if (chosenXAxis === "area_burned_ha") {
+        label = "Area Burned (hectares):";
+    }
+    else if (chosenXAxis === "homeslost") {
+        label = "Homes Lost:";
+    }
+    else {
+        label = "Fatalities:";
+    }
+// may need to update how data is pulled here
+    var toolTip = d3.tip()
+        .attr("class", "d3-tip")
+        .offset([80, -60])
+        .html(function(d) {
+            return(`${d.state}<br>${label} ${d[chosenXAxis]}`);
+        });
+
+    rectGroup.call(toolTip);
+
+    rectGroup.on("mouseover", function(data) {
+        toolTip.show(data);
+    })
+        .on("mouseout", function(data, index) {
+            toolTip.hid(data);
+        });
+
+    return rectGroup;
+}
+
   // Retrieve data from the api endpoint and execute everything below.
-d3.json(bystate_url).then((data) => {
-    // if (err) throw err;
+d3.json(bystate_url).then((data, err) => {
+    if (err) throw err;
 
     console.log(data);
-
     
     // add a JS.filter() to remove the last row of total of all results
     filteredData = data.result.filter(d => d.state != 'Total');
@@ -48,9 +115,12 @@ d3.json(bystate_url).then((data) => {
         data.area_burned_ha = +data.area_burned_ha;
     });
 
+    // use the xScale function above
+    var xBanScale = xScale(filteredData.result, chosenXAxis);
+
     // create variables for each data set
-    var states = filteredData.map(d => d.state);
-    var burnarea = filteredData.map(d => d.area_burned_ha);
+    // var states = filteredData.map(d => d.state);
+    // var burnarea = filteredData.map(d => d.area_burned_ha);
 
     // scale y to chart height
     // need to make this dynamic but have a preset chart
@@ -58,15 +128,11 @@ d3.json(bystate_url).then((data) => {
         .domain([0, d3.max(burnarea)])
         .range([bystatechartHeight, 0]);
 
-    // scale x to chart width
-    var xScale = d3.scaleBand()
-        .domain(states)
-        .range([0, bystatechartWidth])
-        .padding(0.1);
-
-    // create axes
-    var xAxis = d3.axisBottom(xScale);
     var yAxis = d3.axisLeft(yScale);
+
+
+
+
 
     // set x to the bottom of the chart
     chartGroup.append("g")
