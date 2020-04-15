@@ -67,7 +67,7 @@ Another example can be found [here](./application/static/js/buildDataTable.js).
 
 ## Rendering the bushfire map locally
 
-- In order to view the live bushfire map on your own machine, you'll need to save a `config.py` file with a Mapbox API key included in the following format:
+To view the live bushfire map on your own machine, you'll need to create and save a `config.py` file in the root directory within the **application** folder of this repository with a Mapbox API key included in the following format:
 
 ```py
 API_KEY = "your key here"
