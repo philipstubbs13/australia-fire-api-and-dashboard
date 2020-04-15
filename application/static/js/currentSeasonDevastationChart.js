@@ -48,17 +48,20 @@ d3.json(bystate_url).then((data) => {
         data.area_burned_ha = +data.area_burned_ha;
     });
 
+    // create variables for each data set
+    var states = filteredData.map(d => d.state);
+    var burnarea = filteredData.map(d => d.area_burned_ha);
+
     // scale y to chart height
     // need to make this dynamic but have a preset chart
     var yScale = d3.scaleLinear()
-        .domain([d3.min(filteredData.map(d => d.area_burned_ha)), d3.max(filteredData.map(d => d.area_burned_ha))])
+        .domain([0, d3.max(burnarea)])
         .range([bystatechartHeight, 0]);
 
     // scale x to chart width
     var xScale = d3.scaleBand()
-        .domain(filteredData.map(d => d.state))
+        .domain(states)
         .range([0, bystatechartWidth])
-        // .call(wrap, );
         .padding(0.1);
 
     // create axes
@@ -80,41 +83,32 @@ d3.json(bystate_url).then((data) => {
     // set y to the left axis
     chartGroup.append("g")
         .call(yAxis);
-
-
+    
     // create the bar chart
-    chartGroup.selectAll("#bushfire-devastation-chart")
-        .data(data)
+    chartGroup.selectAll("rect")
+        .data(burnarea)
         .enter()
         .append("rect")
-        .attr("x", d => xScale(d))
-        .attr("y", d => yScale(d))
-        .attr("width", xScale.bandwidth())
+        // .classed("")
+        .attr("x", (d, i) => xScale(states[i]))
+        .attr("y", (d, i) => yScale(burnarea[i]))
+        .attr("width", d => xScale.bandwidth())
         .attr("height", d => bystatechartHeight - yScale(d));
-    
+
+    // axis labels
+    chartGroup.append("text")
+        .attr("transform", `translate(${bystatechartWidth / 2}, ${bystatechartHeight + 80})`)
+        .attr("x", 0)
+        .attr("y", 20)
+        .classed("active", true)
+        .text("State");
+
+    chartGroup.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - marginbystate.left + 70)
+        .attr("x", 0 - (bystatechartHeight / 2))
+        .attr("dy", "1em")
+        .classed("active", true)
+        .text("Area Burned (hecares)")
 });
 
-// 
-function wrap(text, width) {
-    text.each(function() {
-      var text = d3.select(this),
-          words = text.text().split(/\s+/).reverse(),
-          word,
-          line = [],
-          lineNumber = 0,
-          lineHeight = 1.1, // ems
-          y = text.attr("y"),
-          dy = parseFloat(text.attr("dy")),
-          tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
-      while (word = words.pop()) {
-        line.push(word);
-        tspan.text(line.join(" "));
-        if (tspan.node().getComputedTextLength() > width) {
-          line.pop();
-          tspan.text(line.join(" "));
-          line = [word];
-          tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
-        }
-      }
-    });
-  }
