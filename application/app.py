@@ -7,8 +7,12 @@ from flask import (
     redirect)
 from flask_pymongo import PyMongo
 from flask_cors import CORS, cross_origin
-from config import API_KEY
 import datetime
+
+try:
+    from config import API_KEY
+except ImportError:
+    config = None
 
 app = Flask(__name__)
 CORS(app)
@@ -24,7 +28,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 # No more page caching/need to hard refresh.
 # Still need to soft refresh the page though when making changes to static files...
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0 
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 # If this app is on production/deployed to heroku.
 if is_prod:
@@ -35,11 +39,13 @@ if is_prod:
   db_name = os.environ.get('DB_NAME', '')
   app.config['MONGO_URI'] = mongo_uri
   app.config['MONGO_DBNAME'] = db_name
+  map_api_key = os.environ.get('MAP_API_KEY', '')
 # else if you are running the app locally.
 else:
   app.debug = True
   db_name = 'australia_fire_db'
   app.config['MONGO_URI'] = f'mongodb://localhost:27017/{db_name}'
+  map_api_key = API_KEY
 
 mongo = PyMongo(app)
 
@@ -53,30 +59,43 @@ def validate(date_string):
     is_valid_date = False
   return is_valid_date
 
+# Create query filter based on start and end date
+def create_date_filter(start_date, end_date):
+  query_filter = {}
+  # If querying fires on or after a particular date and that date is in the correct format.
+  if start_date != None and validate(start_date):
+    # If also querying fires on or before a particular date, that date is in the correct format,
+    # and the start date is before the end date.
+    if end_date != None and validate(end_date) and start_date <= end_date:
+      query_filter['acq_date'] = { '$gte' : start_date, '$lte': end_date }
+    else:
+      query_filter['acq_date'] = { '$gte': start_date }
+  return query_filter
+
 @app.route("/")
 def home_page():
-  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY }
+  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': map_api_key }
   return render_template("home.html", data=data)
 
 @app.route("/charts")
 def charts_page():
-  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY }
+  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': map_api_key }
   return render_template("charts.html", data=data)
 
 @app.route("/data")
 def data_page():
-  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY }
+  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': map_api_key }
   return render_template("data.html", data=data)
 
 @app.route("/map")
 def map_page():
-  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY}
+  data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': map_api_key}
   return render_template("map.html", data=data)
 
 # Route for api docs page.
 @app.route(f"/api/{api_version}/docs")
 def api_docs():
-    data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': API_KEY }
+    data = {'api_base_url': f'{api_base_url}{api_version}', 'API_KEY': map_api_key }
     return render_template("api_documentation.html", data=data)
 
 # GET request - all the MODIS fires.
@@ -88,16 +107,7 @@ def fires_modis():
   limit = request.args.get('limit')
   start_date = request.args.get('start_date')
   end_date = request.args.get('end_date')
-  query_filter = {}
-
-  # If querying fires on or after a particular date and that date is in the correct format.
-  if start_date != None and validate(start_date):
-    # If also querying fires on or before a particular date, that date is in the correct format,
-    # and the start date is before the end date.
-    if end_date != None and validate(end_date) and start_date < end_date:
-      query_filter['acq_date'] = { '$gte' : start_date, '$lte': end_date }
-    else:
-      query_filter['acq_date'] = { '$gte': start_date }
+  query_filter = create_date_filter(start_date, end_date)
 
   if limit != None:
     limit = int(limit)
@@ -129,7 +139,17 @@ def fires_modis():
 @cross_origin()
 def fires_viirs():
 
-  data = mongo.db.fires_viirs.find().limit(100)
+  # Get the values of the request arguments.
+  limit = request.args.get('limit')
+  start_date = request.args.get('start_date')
+  end_date = request.args.get('end_date')
+  query_filter = create_date_filter(start_date, end_date)
+
+  if limit != None:
+    limit = int(limit)
+    data = mongo.db.fires_viirs.find(query_filter).limit(limit)
+  else:
+    data = mongo.db.fires_viirs.find(query_filter)
 
   output = []
 
@@ -154,7 +174,17 @@ def fires_viirs():
 @cross_origin()
 def fires_modis_geojson():
 
-  data = mongo.db.fires_modis.find()
+  # Get the values of the request arguments.
+  limit = request.args.get('limit')
+  start_date = request.args.get('start_date')
+  end_date = request.args.get('end_date')
+  query_filter = create_date_filter(start_date, end_date)
+
+  if limit != None:
+    limit = int(limit)
+    data = mongo.db.fires_modis.find(query_filter).limit(limit)
+  else:
+    data = mongo.db.fires_modis.find(query_filter)
 
   output = []
 
@@ -187,7 +217,17 @@ def fires_modis_geojson():
 @cross_origin()
 def fires_viirs_geojson():
 
-  data = mongo.db.fires_viirs.find()
+   # Get the values of the request arguments.
+  limit = request.args.get('limit')
+  start_date = request.args.get('start_date')
+  end_date = request.args.get('end_date')
+  query_filter = create_date_filter(start_date, end_date)
+
+  if limit != None:
+    limit = int(limit)
+    data = mongo.db.fires_viirs.find(query_filter).limit(limit)
+  else:
+    data = mongo.db.fires_viirs.find(query_filter)
 
   output = []
 
@@ -293,7 +333,9 @@ def aus_temp_rainfall():
       'id': str(fire['_id']),
       'year': fire['Year'],
       'avg_annual_temp': fire['Avg Annual Temp'],
-      'avg_annual_rainfall' : fire['Avg Annual Rainfall']
+      'avg_annual_rainfall' : fire['Avg Annual Rainfall'],
+      'temp_difference': fire['temp_differnce'],
+      'rainfall_difference': fire['rainfall_difference']
     })
 
   return jsonify({'result' : output})
@@ -353,20 +395,20 @@ def fires_time_series():
   dates = []
   for fire in output:
     key = 'acq_date'
-    if key in fire.keys(): 
-      dates.append(fire[key]) 
-  
+    if key in fire.keys():
+      dates.append(fire[key])
+
   # Count how many times each date appears in the list to determine how many fires there were.
   freq = {}
   freq_list = []
-  for date in dates: 
-    if (date in freq): 
+  for date in dates:
+    if (date in freq):
       freq[date] += 1
-    else: 
+    else:
       freq[date] = 1
-  
+
   # Return the data in a format the the d3-timeseries library can used to plot it.
-  for key, value in freq.items(): 
+  for key, value in freq.items():
     freq_list.append({ 'x': key, 'y': value })
 
   return jsonify({'result' : freq_list})
