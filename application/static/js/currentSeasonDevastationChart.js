@@ -91,13 +91,16 @@ function updateDevastationToolTip(chosenYAxis, rectGroup, statelist) {
         .attr("class", "d3-tip")
         .offset([80, -60])
         .html(function(d, i) {
-            return(`${d[state]}<br>${label} ${d[chosenYAxis]}`);
+            return(`
+            State: ${d.state}<br>
+            ${label} ${d[chosenYAxis]}
+            `);
         });
 
     rectGroup.call(toolTip);
 
-    rectGroup.on("mouseover", function(data) {
-        toolTip.show(data);
+    rectGroup.on("mouseover", function(d) {
+        toolTip.show(d);
     })
         .on("mouseout", function(data, index) {
             toolTip.hide(data);
@@ -143,7 +146,7 @@ d3.json(bystate_url).then((data, err) => {
     var yAxis = d3.axisLeft(yLinearScale);
 
     // set x to the bottom of the chart
-    var leftAxis = chartGroup.append("g")
+    var bottomAxis = chartGroup.append("g")
         .attr("transform", `translate(0, ${bystatechartHeight})`)
         .call(xAxis)
         .selectAll("text")	
@@ -155,7 +158,7 @@ d3.json(bystate_url).then((data, err) => {
                 });
 
     // set y to the left axis
-    chartGroup.append("g")
+    var leftAxis = chartGroup.append("g")
         .call(yAxis);
     
     // append initial rectangles
