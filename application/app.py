@@ -8,7 +8,6 @@ from flask import (
 from flask_pymongo import PyMongo
 from flask_cors import CORS, cross_origin
 import datetime
-import pandas as pd
 
 try:
     from config import API_KEY
