@@ -6,6 +6,65 @@ const states = "https://raw.githubusercontent.com/rowanhogan/australian-states/m
 const areaURL = `${api_base_url}/fires_bystate`;
 
 // add loading spinner while data is fetched, before d3.json https://github.com/makinacorpus/Leaflet.Spin
+// work on improving speed https://community.rstudio.com/t/plotting-thousands-of-points-in-leaflet-a-way-to-improve-the-speed/8196/3
+
+//////////// CREATE THE BASEMAP //////////////////
+// so we have something to look at while data loads
+
+var borders, modisHeat, viirsHeat;
+
+let satellite = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+    attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+    maxZoom: 18,
+    id: "mapbox.satellite",
+    accessToken: API_KEY
+  });
+
+let outdoors = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+  attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+  maxZoom: 18,
+  id: "mapbox.outdoors",
+  accessToken: API_KEY
+});
+
+// Define a baseMaps object for maps layers
+let baseMaps = {
+  "Satellite": satellite,
+  "Outdoors": outdoors
+};
+
+// Create our map object
+let myMap = L.map("map", {
+  center: [
+    -25.799055, 134.538941
+  ],
+  zoom: 5, 
+  layers: [outdoors] 
+});
+
+// Add legend to the map that describes how to interact and what data is in the different layers
+
+// Create a legend
+var legend = L.control({ position: "bottomright" });
+
+legend.onAdd = function() {
+  var div = L.DomUtil.create("div", "info legend");      
+
+  div.innerHTML = `<div class=\"labels\">
+                    <h3>Australian Bushfires, December 21-31, 2019</h3> 
+                    <p>This map contains satellite data readings 
+                    from ten days in December 2019, the worst of the recent 
+                    bushfire season.</p>
+                    <p>Toggle between VIIRS and MODIS satellite 
+                    readings using the controls above.</p>
+                    <p>Learn more about losses during the entire 
+                    2019-2020 bushfire season by activating the 
+                    State Losses layer and clicking on each state.</p>
+                  </div>`;
+  return div;
+};
+
+legend.addTo(myMap);
 
 //////////// IMPORT THE DATA //////////////////
 function getData(modisURL, viirsURL) {
@@ -162,21 +221,6 @@ function makeFeatures(modisData, viirsData, stateData, areaData) {
     onEachFeature: onEachFeature
   });
 
-  // create timeline layer feature
-  // let timelineLayer = L.timeline(modisData, {
-  //   getInterval: function(datapoint) {
-  //     return {
-  //       start: datapoint.properties.acq_date,
-  //       end: datapoint.properties.acq_date
-  //     };
-  //   },
-  //   pointToLayer: function(data, latlng){
-  //     return L.marker(latlng);
-  //   }
-  // });
-
-  // console.log(timelineLayer);
-
   // call makemap function to create the basemap and apply the features
   makeMap(modisHeat, viirsHeat, borders);
   
@@ -186,26 +230,6 @@ function makeFeatures(modisData, viirsData, stateData, areaData) {
 function makeMap(modisHeat, viirsHeat, borders) {
   // Define map style option layers
 
-  let satellite = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
-    attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
-    maxZoom: 18,
-    id: "mapbox.satellite",
-    accessToken: API_KEY
-  });
-
-  let outdoors = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
-    attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
-    maxZoom: 18,
-    id: "mapbox.outdoors",
-    accessToken: API_KEY
-  });
-
-  // Define a baseMaps object for maps layers
-  let baseMaps = {
-    "Satellite": satellite,
-    "Outdoors": outdoors
-  };
-
   // Define overlayMaps for marker layers
   let overlayMaps = {
     "State losses (total)": borders,
@@ -214,58 +238,36 @@ function makeMap(modisHeat, viirsHeat, borders) {
     // "Timeline (dates)": timelineLayer
   };
 
-  // var timelineControl = L.timelineSliderControl({
-  //   start: 2019-08-01,
-  //   end: 2019-08-03,
-  //   formatOutput: function(date) {
-  //     return date.toString();
-  //   },
-  //   enablePlayback: true,
-  //   waitToUpdateMap: false,
-  //   // changeMap: changeMapFunction // https://stackoverflow.com/questions/58203571/why-the-slider-is-not-displayed-on-the-map
-  // });
+  // // var timelineControl = L.timelineSliderControl({
+  // //   start: 2019-08-01,
+  // //   end: 2019-08-03,
+  // //   formatOutput: function(date) {
+  // //     return date.toString();
+  // //   },
+  // //   enablePlayback: true,
+  // //   waitToUpdateMap: false,
+  // //   // changeMap: changeMapFunction // https://stackoverflow.com/questions/58203571/why-the-slider-is-not-displayed-on-the-map
+  // // });
 
+  modisHeat.addLayer(myMap);
+  viirsHeat.addLayer(myMap);
+  borders.addLayer(myMap);
+  overlayMaps.addLayer(myMap);
 
   // Create a layer control
   let layerControl = L.control.layers(baseMaps, overlayMaps, {
     collapsed: false
   });
 
-  // Create our map object
-  let myMap = L.map("map", {
-    center: [
-      -25.799055, 134.538941
-    ],
-    zoom: 5, 
-    layers: [outdoors, modisHeat] // TODO Add in features here
-  });
-
-  // Add legend to the map that describes how to interact and what data is in the different layers
-
-  // Create a legend
-  var legend = L.control({ position: "bottomright" });
-
-  legend.onAdd = function() {
-    var div = L.DomUtil.create("div", "info legend");      
-
-    div.innerHTML = `<div class=\"labels\">
-                      <h3>Australian Bushfires, December 21-31, 2019</h3> 
-                      <p>This map contains satellite data readings 
-                      from ten days in December 2019, the worst of the recent 
-                      bushfire season.</p>
-                      <p>Toggle between VIIRS and MODIS satellite 
-                      readings using the controls above.</p>
-                      <p>Learn more about losses during the entire 
-                      2019-2020 bushfire season by activating the 
-                      State Losses layer and clicking on each state.</p>
-                    </div>`;
-    return div;
-  };
-
-  legend.addTo(myMap);
-  // Add layer control to the map
   layerControl.addTo(myMap);
-  // timelineControl.addTo(map);
-  // timelineControl.addTimelines(timelineLayer);
-  // timelineLayer.addTo(map);
+
+  // Create our map object
+  // let myMap = L.map("map", {
+  //   center: [
+  //     -25.799055, 134.538941
+  //   ],
+  //   zoom: 5, 
+  //   layers: [outdoors, modisHeat] // TODO Add in features here
+  // });
+
 }
