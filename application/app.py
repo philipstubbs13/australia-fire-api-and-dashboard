@@ -350,19 +350,19 @@ def fires_time_series():
 
   # Get the values of the request arguments.
   # (i.e, these values are what the user selects in the UI).
-  satellite = request.args.get('satellite')
-  time = request.args.get('time')
+  # satellite = request.args.get('satellite')
+  # time = request.args.get('time')
   start_date = request.args.get('start_date')
   end_date = request.args.get('end_date')
   query_filter = {}
 
   # If querying fires by type of satellite.
-  if satellite != None and satellite != 'All':
-    query_filter["satellite"] = satellite
+  # if satellite != None and satellite != 'All':
+  #   query_filter["satellite"] = satellite
 
-  # If querying fires by the time of day.
-  if time != None and time != 'All':
-    query_filter["daynight"] = time
+  # # If querying fires by the time of day.
+  # if time != None and time != 'All':
+  #   query_filter["daynight"] = time
 
   # If querying fires on or after a particular date and that date is in the correct format.
   if start_date != None and validate(start_date):
@@ -373,36 +373,16 @@ def fires_time_series():
     else:
       query_filter['acq_date'] = { '$gte': start_date }
 
-  data = mongo.db.fires_modis.find(query_filter)
+  data = mongo.db.fires_time_series.find(query_filter)
 
   output = []
 
   for fire in data:
     output.append({
       'id': str(fire['_id']),
-      'acq_date': fire['acq_date'],
-      'acq_time': fire['acq_time'],
-      'brightness' : fire['brightness'],
-      'daynight' : fire['daynight'],
-      'frp': fire['frp'],
-      'instrument': fire['instrument'],
-      'latitude': fire['latitude'],
-      'longitude': fire['longitude'],
-      'satellite': fire['satellite'],
-      'bright_t31': fire['bright_t31']
+      'x': fire['acq_date'],
+      'y': fire['number_fires'],
     })
-
-  temp = pd.DataFrame(output)
-  temp = temp["acq_date"].value_counts()
-  temp.to_frame()
-  temp = temp.reset_index()
-  temp = temp.rename(columns={
-      "index": "x",
-      "acq_date": "y"
-  })
-  temp = temp.sort_values(by='x')
-  temp_dict = temp.to_dict('range')
-  temp_dict
 
   # Create a list of just the dates.
   # dates = []
@@ -424,7 +404,7 @@ def fires_time_series():
   # for key, value in freq.items():
   #   freq_list.append({ 'x': key, 'y': value })
 
-  return jsonify({'result' : temp_dict })
+  return jsonify({'result' : output })
 
 if __name__ == "__main__":
     app.run()
