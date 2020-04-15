@@ -24,8 +24,6 @@ var svgbystate = d3.select("#bushfire-devastation-chart")
     // .attr("width", bystatechartWidth)
     // .attr("height", bystatechartHeight);
 
-// console.log(bystatechartWidth)
-
 // shift everything over by the margins
 var chartGroup = svgbystate.append("g")
     .attr("transform", `translate(${marginbystate.left}, ${marginbystate.top})`);
@@ -68,7 +66,8 @@ function renderAxes(newyScale, yAxis) {
 function renderRectangles(rectGroup, newyScale, chosenYAxis) {
     rectGroup.transition()
         .duration(1000)
-        .attr("y", d => newyScale(d[chosenYAxis]));
+        .attr("y", d => newyScale(d[chosenYAxis]))
+        .attr("height", d => bystatechartHeight - newyScale(d[chosenYAxis]));
 
     return rectGroup;
 }
@@ -146,7 +145,7 @@ d3.json(bystate_url).then((data, err) => {
     var yAxis = d3.axisLeft(yLinearScale);
 
     // set x to the bottom of the chart
-    var bottomAxis = chartGroup.append("g")
+    chartGroup.append("g")
         .attr("transform", `translate(0, ${bystatechartHeight})`)
         .call(xAxis)
         .selectAll("text")	
@@ -235,7 +234,7 @@ d3.json(bystate_url).then((data, err) => {
 
                 rectGroup = renderRectangles(rectGroup, yLinearScale, chosenYAxis);
 
-                rectGroup = updateDevastationToolTip(chosenYAxis, rectGroup);
+                rectGroup = updateDevastationToolTip(chosenYAxis, rectGroup, state);
 
                 // chages classes to change bold text
                 if (chosenYAxis === "area_burned_ha") {
