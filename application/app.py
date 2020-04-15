@@ -8,6 +8,7 @@ from flask import (
 from flask_pymongo import PyMongo
 from flask_cors import CORS, cross_origin
 import datetime
+import pandas as pd
 
 try:
     from config import API_KEY
@@ -391,27 +392,39 @@ def fires_time_series():
       'bright_t31': fire['bright_t31']
     })
 
+  temp = pd.DataFrame(output)
+  temp = temp["acq_date"].value_counts()
+  temp.to_frame()
+  temp = temp.reset_index()
+  temp = temp.rename(columns={
+      "index": "x",
+      "acq_date": "y"
+  })
+  temp = temp.sort_values(by='x')
+  temp_dict = temp.to_dict('range')
+  temp_dict
+
   # Create a list of just the dates.
-  dates = []
-  for fire in output:
-    key = 'acq_date'
-    if key in fire.keys():
-      dates.append(fire[key])
+  # dates = []
+  # for fire in output:
+  #   key = 'acq_date'
+  #   if key in fire.keys():
+  #     dates.append(fire[key])
 
-  # Count how many times each date appears in the list to determine how many fires there were.
-  freq = {}
-  freq_list = []
-  for date in dates:
-    if (date in freq):
-      freq[date] += 1
-    else:
-      freq[date] = 1
+  # # Count how many times each date appears in the list to determine how many fires there were.
+  # freq = {}
+  # freq_list = []
+  # for date in dates:
+  #   if (date in freq):
+  #     freq[date] += 1
+  #   else:
+  #     freq[date] = 1
 
-  # Return the data in a format the the d3-timeseries library can used to plot it.
-  for key, value in freq.items():
-    freq_list.append({ 'x': key, 'y': value })
+  # # Return the data in a format the the d3-timeseries library can used to plot it.
+  # for key, value in freq.items():
+  #   freq_list.append({ 'x': key, 'y': value })
 
-  return jsonify({'result' : freq_list})
+  return jsonify({'result' : temp_dict })
 
 if __name__ == "__main__":
     app.run()
