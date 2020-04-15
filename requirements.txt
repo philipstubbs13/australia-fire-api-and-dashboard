@@ -17,4 +17,3 @@ flask_pymongo
 dnspython
 flask_cors
 datetime
-pandas
