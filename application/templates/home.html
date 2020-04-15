@@ -1,7 +1,63 @@
-{% extends 'layout.html' %} {% block body %}
-<div class="jumbotron jumbotron-fluid bg-dark text-light">
-  <div class="container text-center">
-    <h1 class="display-4">Australia Fires</h1>
+{% extends 'layout.html' %} {% block body %}f
+<div class="row">
+  <div class="col-md-8 col-xs-12 col-sm-12 mt-5">
+    <div class="card mt-3">
+      <div class="card-body">
+        <h3>Visualizing Australia Fires Over Time</h3>
+        <hr/>
+        <h5 class="mt-4">About</h5>
+        <p>
+          This project explores how wildfires have affected the country of Australia over time. Specifically, for this project, we gathered data captured by NASA satellites and various historical wildfire and climate data to help visualize what Australia not only has been through historically but also what Australia has gone through with the most recent (2019-2020) wildfire season. Use the links to the right to learn more about this project.
+        </p>
+        <div class="row">
+          <div class="col-md-4">
+            <h5 class="mt-4">Team</h5>
+            <p>Stacy Konkiel</p>
+            <p>Abby Lemon</p>
+            <p>Jenna Nytes</p>
+            <p>Phil Stubbs</p>
+            <h5 class="mt-5">
+              GitHub Repository
+            </h5>
+            <a href="https://github.com/philipstubbs13/australia-fire-api-and-dashboard" target="_blank">
+              <i class="fab fa-github fa-2x"></i>
+            </a>
+          </div>
+          <div class="col-md-8">
+            <img class="landing-image img-fluid" src="../static/images/fires_time_series.png" alt="historical fires" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 col-xs-12 col-sm-12 mt-5">
+    <div class="card mt-3">
+      <div class="card-body">
+        <h5 class="card-title">Visualizations</h5>
+        <p class="card-text">Explore the history of Autralian wildfires and the impact they have had on Australia
+          through interactive D3 visualizations.</p>
+        <a type="button" href="/charts" class="btn btn-dark mt-2">View Visualizations</a>
+      </div>
+    </div>
+    <div class="card mt-3">
+      <div class="card-body">
+        <h5 class="card-title">API</h5>
+        <p class="card-text">Access historical, satellite, and climate data related to Australian wildfires through a
+          Python Flask REST API. </p>
+        <a type="button" href="/api/v1.0/docs" class="btn btn-dark mt-2">Explore API</a>
+      </div>
+    </div>
+    <div class="card mt-3">
+      <div class="card-body">
+        <h5 class="card-title">Map</h5>
+        <p class="card-text">
+          See how the 2019-2020 Australian wildfire season has affected the lives of people and animals across the
+          different states as captured by NASA satellites.
+        </p>
+        <a type="button" href="/map" target="_blank" class="btn btn-dark mt-2">Go to Map</a>
+      </div>
+    </div>
+
   </div>
 </div>
 {% endblock %}

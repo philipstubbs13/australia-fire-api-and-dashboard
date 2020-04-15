@@ -1,4 +1,4 @@
-const fires_modis_url = `${api_base_url}/fires_modis?limit=100`;
+const fires_modis_url = `${api_base_url}/fires_modis?limit=50`;
 const table = d3.select('#fires-modis-table');
 const tableBody = table.select('tbody');
 

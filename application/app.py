@@ -103,8 +103,6 @@ def api_docs():
 @cross_origin()
 def fires_modis():
 
-  data = mongo.db.fires_modis.find()
-
   # Get the values of the request arguments.
   limit = request.args.get('limit')
   start_date = request.args.get('start_date')
