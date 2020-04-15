@@ -113,3 +113,8 @@ const buildTimeSeries = () => {
 
 buildTimeSeries();
 
+d3.select("#download-time-series-chart")
+  .on("click", () => {
+    saveSvgAsPng(document.querySelector("#fires-time-series-chart svg"), "fires_time_series.png", { backgroundColor: '#fff' });
+  });
+
