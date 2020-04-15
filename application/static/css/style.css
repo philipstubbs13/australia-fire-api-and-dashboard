@@ -2,8 +2,8 @@
   color: #fff !important;
 }
 
-.a:hover {
-  color: #00bc8c !important;
+a:hover {
+  color: orangered !important;
 }
 
 code {
@@ -23,3 +23,5 @@ body {
 .container {
   flex: 1;
 }
+
+

@@ -22,6 +22,8 @@ const chartHeight = svgHeight - margin.top - margin.bottom;
 
 const api_url = `${api_base_url}/fires_historical`;
 
+const historicalChartSvg = "historical-chart-svg"
+
 // Function to populate select dropdown with options.
 const populateFireSelectDropdown = (options, selectElement) => {
   selectElement
@@ -47,6 +49,7 @@ const drawHistoricalComparisonChart = () => {
   const svg = d3.select("#historical-comparison-chart")
     .append("svg")
     .attr("class", "svg")
+    .attr("id", historicalChartSvg)
     .attr("viewBox", `0 0 ${svgWidth} ${svgHeight}`)
 
   // Append an SVG group.
@@ -384,3 +387,8 @@ const updateToolTip = (chosenXAxis, chosenYAxis, circlesGroup) => {
 }
 
 drawHistoricalComparisonChart();
+
+d3.select("#download-historical-chart")
+  .on("click", () => {
+    saveSvgAsPng(document.getElementById(historicalChartSvg), "historical_fires.png", { backgroundColor: '#fff' });
+  });
