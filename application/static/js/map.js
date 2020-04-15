@@ -5,9 +5,9 @@ const viirsURL = `${api_base_url}/fires_viirs_geojson` + params;
 const states = "https://raw.githubusercontent.com/rowanhogan/australian-states/master/states.geojson";
 const areaURL = `${api_base_url}/fires_bystate`;
 
-// add loading spinner while data is fetched, before d3.json https://github.com/makinacorpus/Leaflet.Spin
 
 //////////// IMPORT THE DATA //////////////////
+
 function getData(modisURL, viirsURL) {
   d3.json(modisURL).then(modisData => {
 
@@ -100,8 +100,6 @@ function animalDeaths(hectareData, stateName) {
 //////////// MAKE THE FEATURES //////////////////
 function makeFeatures(modisData, viirsData, stateData, areaData) {
 
-  // modisData = geoJSON file needed for timeline layer
-  // modisFeatures = regular JSON to parse for heatmap layer
   let modisFeatures = modisData.features;
 
   // parse data for heatmap
@@ -162,21 +160,6 @@ function makeFeatures(modisData, viirsData, stateData, areaData) {
     onEachFeature: onEachFeature
   });
 
-  // create timeline layer feature
-  // let timelineLayer = L.timeline(modisData, {
-  //   getInterval: function(datapoint) {
-  //     return {
-  //       start: datapoint.properties.acq_date,
-  //       end: datapoint.properties.acq_date
-  //     };
-  //   },
-  //   pointToLayer: function(data, latlng){
-  //     return L.marker(latlng);
-  //   }
-  // });
-
-  // console.log(timelineLayer);
-
   // call makemap function to create the basemap and apply the features
   makeMap(modisHeat, viirsHeat, borders);
   
@@ -211,20 +194,7 @@ function makeMap(modisHeat, viirsHeat, borders) {
     "State losses (total)": borders,
     "Fire intensity (MODIS)": modisHeat,
     "Fire intensity (VIIRS)": viirsHeat
-    // "Timeline (dates)": timelineLayer
   };
-
-  // var timelineControl = L.timelineSliderControl({
-  //   start: 2019-08-01,
-  //   end: 2019-08-03,
-  //   formatOutput: function(date) {
-  //     return date.toString();
-  //   },
-  //   enablePlayback: true,
-  //   waitToUpdateMap: false,
-  //   // changeMap: changeMapFunction // https://stackoverflow.com/questions/58203571/why-the-slider-is-not-displayed-on-the-map
-  // });
-
 
   // Create a layer control
   let layerControl = L.control.layers(baseMaps, overlayMaps, {
@@ -237,7 +207,7 @@ function makeMap(modisHeat, viirsHeat, borders) {
       -25.799055, 134.538941
     ],
     zoom: 5, 
-    layers: [outdoors, modisHeat] // TODO Add in features here
+    layers: [outdoors, modisHeat]
   });
 
   // Add legend to the map that describes how to interact and what data is in the different layers
@@ -246,7 +216,7 @@ function makeMap(modisHeat, viirsHeat, borders) {
   var legend = L.control({ position: "bottomright" });
 
   legend.onAdd = function() {
-    var div = L.DomUtil.create("div", "info legend");      
+    let div = L.DomUtil.create("div", "info legend");      
 
     div.innerHTML = `<div class=\"labels\">
                       <h3>Australian Bushfires, December 21-31, 2019</h3> 
@@ -263,9 +233,5 @@ function makeMap(modisHeat, viirsHeat, borders) {
   };
 
   legend.addTo(myMap);
-  // Add layer control to the map
   layerControl.addTo(myMap);
-  // timelineControl.addTo(map);
-  // timelineControl.addTimelines(timelineLayer);
-  // timelineLayer.addTo(map);
 }
