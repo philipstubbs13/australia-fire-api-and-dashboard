@@ -1,11 +1,13 @@
-const modisURL = `${api_base_url}/fires_modis`;
-const viirsURL = `${api_base_url}/fires_viirs`;
+const params = "?start_date=2019-12-24&end_date=2019-12-31"
+
+const modisURL = `${api_base_url}/fires_modis` + params;
+const viirsURL = `${api_base_url}/fires_viirs` + params;
 const states = "https://raw.githubusercontent.com/rowanhogan/australian-states/master/states.geojson";
 const areaURL = `${api_base_url}/fires_bystate`;
 
-// add loading spinner while data is fetched, before d3.json https://github.com/makinacorpus/Leaflet.Spin
 
 //////////// IMPORT THE DATA //////////////////
+
 function getData(modisURL, viirsURL) {
   d3.json(modisURL).then(modisData => {
 
@@ -28,7 +30,6 @@ function getData(modisURL, viirsURL) {
 
     }).catch(e => {
       console.log(e);
-
     });
       
   }).catch(e => {
@@ -97,6 +98,7 @@ function animalDeaths(hectareData, stateName) {
 //////////// MAKE THE FEATURES //////////////////
 function makeFeatures(modisData, viirsData, stateData, areaData) {
 
+  // parse data for heatmap
   const modisDataArr = Object.entries(modisData);
   const viirsDataArr = Object.entries(viirsData);
 
@@ -111,6 +113,9 @@ function makeFeatures(modisData, viirsData, stateData, areaData) {
       modisHeatArray.push([datapoint.latitude, datapoint.longitude, datapoint.brightness]);
     }
   }
+
+  console.log(modisHeatArray);
+
 
   let modisHeat = L.heatLayer(modisHeatArray, {
     radius: 20,
@@ -133,7 +138,6 @@ function makeFeatures(modisData, viirsData, stateData, areaData) {
   // make state boundaries
 
   // feature creation function & get state names
-  let stateNames = [];
 
   function onEachFeature(feature, layer) {
     L.polyline(feature.geometry.coordinates);
@@ -153,19 +157,6 @@ function makeFeatures(modisData, viirsData, stateData, areaData) {
   let borders = L.geoJSON(stateData, {
     onEachFeature: onEachFeature
   });
-
-  // create timeline layer feature
-  // let timelineLayer = L.timeline(modisDataArr[0][1], {
-  //   getInterval: function(datapoint) {
-  //     return {
-  //       start: datapoint.acq_time,
-  //       end: datapoint.acq_time
-  //     };
-  //   },
-  //   pointToLayer: modisHeat
-  // });
-
-  // also look at this tutorial for timeline options http://adilmoujahid.com/posts/2015/01/interactive-data-visualization-d3-dc-python-mongodb/
 
   // call makemap function to create the basemap and apply the features
   makeMap(modisHeat, viirsHeat, borders);
@@ -198,32 +189,10 @@ function makeMap(modisHeat, viirsHeat, borders) {
 
   // Define overlayMaps for marker layers
   let overlayMaps = {
-    "States": borders,
+    "State losses (total)": borders,
     "Fire intensity (MODIS)": modisHeat,
     "Fire intensity (VIIRS)": viirsHeat
   };
-
-  // // Create a legend
-  // var legend = L.control({ position: "bottomright" });
-
-  // legend.onAdd = function() {
-  //   var div = L.DomUtil.create("div", "info legend");
-  //   var limits = ["0-1", "1-2", "2-3", "3-4", "4-5", "5+"];
-  //   var labels = [];      
-
-  //   div.innerHTML = "<div class=\"labels\"></div>";
-
-  //   limits.forEach(function(limit, index) {
-
-  //     var colors = ["#c4f069", "#e5f16a", "#efdb67", "#eabb61", "#e5a975", "#e0736f"]
-  //     labels.push(`<li style=\"background-color: ${colors[index]};\"><span class=\"legendText\">${limits[index]}</span></li>`);
-  //   }); // TODO: Get numbers to appear alongside color boxes
-
-  //   div.innerHTML += "<ul>" + labels.join("") + "</ul>";
-  //   return div;
-  // };
-
-  // create a slider for date data (to see changes by day) https://digital-geography.com/filter-leaflet-maps-slider/
 
   // Create a layer control
   let layerControl = L.control.layers(baseMaps, overlayMaps, {
@@ -235,18 +204,32 @@ function makeMap(modisHeat, viirsHeat, borders) {
     center: [
       -25.799055, 134.538941
     ],
-    zoom: 5, 
-    layers: [outdoors, modisHeat] // TODO Add in features here
+    zoom:4, 
+    layers: [outdoors, modisHeat]
   });
 
-  // Add legend to the map
-  // legend.addTo(myMap);
-  // Add layer control to the map
+  // Add legend to the map that describes how to interact and what data is in the different layers
+
+  // Create a legend
+  var legend = L.control({ position: "bottomright" });
+
+  legend.onAdd = function() {
+    let div = L.DomUtil.create("div", "info legend");      
+
+    div.innerHTML = `<div class=\"labels\">
+                      <h3>Australian Bushfires, December 24-31, 2019</h3> 
+                      <p>This map contains satellite data readings 
+                      from the last week of December 2019, the worst of the recent 
+                      bushfire season.</p>
+                      <p>Toggle between VIIRS and MODIS satellite 
+                      readings using the controls above.</p>
+                      <p>Learn more about losses during the entire 
+                      2019-2020 bushfire season by activating the 
+                      State Losses layer and clicking on each state.</p>
+                    </div>`;
+    return div;
+  };
+
+  legend.addTo(myMap);
   layerControl.addTo(myMap);
-
 }
-
-// FOR TIMELINE
-// create endpoint that would grab data from MongoDB, create JSON -> GeoJSON and then serve it
-
-// https://stackoverflow.com/questions/55887875/how-to-convert-json-to-geojson
