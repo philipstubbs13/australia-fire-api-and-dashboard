@@ -73,7 +73,7 @@ function renderRectangles(rectGroup, newyScale, chosenYAxis) {
 }
 
 // d3 tool tip
-function updateDevastationToolTip(chosenYAxis, rectGroup, statelist) {
+function updateDevastationToolTip(chosenYAxis, rectGroup) {
     var label;
 
     if (chosenYAxis === "area_burned_ha") {
@@ -91,7 +91,7 @@ function updateDevastationToolTip(chosenYAxis, rectGroup, statelist) {
         .offset([80, -60])
         .html(function(d, i) {
             return(`
-            State: ${statelist[i]}<br>
+            State: ${d.state}<br>
             ${label} ${d[chosenYAxis]}
             `);
         });
@@ -217,7 +217,7 @@ d3.json(bystate_url).then((data, err) => {
     //     .text("Area Burned (hectares)")
 
     // updateDevastationToolTip from function above on json import
-    var rectGroup = updateDevastationToolTip(chosenYAxis, rectGroup, state);
+    var rectGroup = updateDevastationToolTip(chosenYAxis, rectGroup);
 
     // y axis label event listener
     labelsGroup.selectAll("text")
