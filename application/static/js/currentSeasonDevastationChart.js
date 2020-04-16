@@ -178,7 +178,7 @@ d3.json(bystate_url).then((data, err) => {
     var areaLabel = labelsGroup.append("text")
         .attr("y", 0 - marginbystate.left + 65)
         .attr("x", 0 - (bystatechartHeight / 2))
-        .attr("dy", "1em")
+        // .attr("dy", "1em")
         .attr("value", "area_burned_ha")
         .classed("active", true)
         .text("Area Burned (hectares)");
@@ -186,7 +186,7 @@ d3.json(bystate_url).then((data, err) => {
     var homesLabel = labelsGroup.append("text")
         .attr("y", 0 - marginbystate.left + 25)
         .attr("x", 0 - (bystatechartHeight / 2))
-        .attr("dy", "1em")
+        // .attr("dy", "1em")
         .attr("value", "homeslost")
         .classed("inactive", true)
         .text("Homes Destroyed");
@@ -194,7 +194,7 @@ d3.json(bystate_url).then((data, err) => {
     var fatalitiesLabel = labelsGroup.append("text")
         .attr("y", 0 - marginbystate.left + 45)
         .attr("x", 0 - (bystatechartHeight / 2))
-        .attr("dy", "1em")
+        // .attr("dy", "1em")
         .attr("value", "fatalities")
         .classed("inactive", true)
         .text("Fatalities");  
@@ -245,7 +245,7 @@ d3.json(bystate_url).then((data, err) => {
                         .classed("acitve", false)
                         .classed("inactive", true);
                     fatalitiesLabel
-                        .classed("acitve", false)
+                        .classed("active", false)
                         .classed("inactive", true);
                 }
                 else if (chosenYAxis === "homeslost") {
@@ -253,10 +253,10 @@ d3.json(bystate_url).then((data, err) => {
                         .classed("active", false)
                         .classed("inactive", true);
                     homesLabel
-                        .classed("acitve", true)
+                        .classed("active", true)
                         .classed("inactive", false);
                     fatalitiesLabel
-                        .classed("acitve", false)
+                        .classed("active", false)
                         .classed("inactive", true);
                 }
                 else {
@@ -264,10 +264,10 @@ d3.json(bystate_url).then((data, err) => {
                         .classed("active", false)
                         .classed("inactive", true);
                     homesLabel
-                        .classed("acitve", false)
+                        .classed("active", false)
                         .classed("inactive", true);
                     fatalitiesLabel
-                        .classed("acitve", true)
+                        .classed("active", true)
                         .classed("inactive", false);
                 }
             }
