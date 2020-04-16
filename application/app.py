@@ -113,7 +113,7 @@ def fires_modis():
     limit = int(limit)
     data = mongo.db.fires_modis.find(query_filter).limit(limit)
   else:
-    data = mongo.db.fires_modis.find(query_filter)
+    data = mongo.db.fires_modis.find(query_filter).limit(1500)
 
   output = []
 
@@ -149,7 +149,7 @@ def fires_viirs():
     limit = int(limit)
     data = mongo.db.fires_viirs.find(query_filter).limit(limit)
   else:
-    data = mongo.db.fires_viirs.find(query_filter)
+    data = mongo.db.fires_viirs.find(query_filter).limit(1500)
 
   output = []
 
@@ -184,7 +184,7 @@ def fires_modis_geojson():
     limit = int(limit)
     data = mongo.db.fires_modis.find(query_filter).limit(limit)
   else:
-    data = mongo.db.fires_modis.find(query_filter)
+    data = mongo.db.fires_modis.find(query_filter).limit(1500)
 
   output = []
 
@@ -227,7 +227,7 @@ def fires_viirs_geojson():
     limit = int(limit)
     data = mongo.db.fires_viirs.find(query_filter).limit(limit)
   else:
-    data = mongo.db.fires_viirs.find(query_filter)
+    data = mongo.db.fires_viirs.find(query_filter).limit(1500)
 
   output = []
 
