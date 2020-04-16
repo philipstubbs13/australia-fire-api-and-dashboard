@@ -127,10 +127,24 @@ const drawHistoricalComparisonChart = () => {
     // Populate dropdown with list of fires.
     populateFireSelectDropdown(data.result, historicalChartFireSelect);
 
+    // Display 2019-20 Australia Fire by default
+    let singleFireContainer = d3.select('.single-fire-container');
+    const fire2019Stats = data.result.find(fire => fire.name === fireSeason201920)
+    Object.entries(fire2019Stats).forEach(([key, value]) => {
+      if (key !== "id") {
+        singleFireContainer.append('p')
+          .html(`
+            <span class="font-weight-bold">${key.replace(/_/g, ' ')}: 
+            <span class="font-weight-normal" style="font-size: 16px">${value != null ? value : 'Info Not Available'}</span>
+            <br>
+        `)
+          .style("margin-top", "10px")
+      }
+    })
+
     // Function that gets fired when value of input changes.
     d3.select('#historicalFire').on('change', function (event) {
       const fireToDisplay = data.result.find(fire => fire.id === d3.event.target.value)
-      let singleFireContainer = d3.select('.single-fire-container');
       singleFireContainer.html('');
       Object.entries(fireToDisplay).forEach(([key, value]) => {
         if (key !== "id" && key !== "name") {
@@ -378,9 +392,23 @@ const updateToolTip = (chosenXAxis, chosenYAxis, circlesGroup) => {
 
   circlesGroup.on("mouseover", function (d) {
     toolTip.show(d, this);
+    d3.select(this)
+      .transition()
+      .duration(1000)
+      .attr("r", 20)
   })
     .on("mouseout", function (data, index) {
       toolTip.hide(data);
+      d3.select(this)
+        .transition()
+        .duration(1000)
+        .attr("r", (d, i) => {
+          if (d.name === fireSeason201920) {
+            return "12"
+          } else {
+            return "9"
+          }
+        })
     });
 
   return circlesGroup;
