@@ -114,8 +114,6 @@ function makeFeatures(modisData, viirsData, stateData, areaData) {
     }
   }
 
-  console.log(modisHeatArray);
-
 
   let modisHeat = L.heatLayer(modisHeatArray, {
     radius: 20,
