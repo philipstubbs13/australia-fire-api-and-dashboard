@@ -49,26 +49,27 @@ d3.json(tempRain_url).then((weatherData, err) => {
         data.temp_difference = +data.temp_difference;
         data.rainfall_difference = +data.rainfall_difference;
       });
+    
+    var year = weatherData.result.map(d => d.year);
+      console.log(year);
+
+    var avg_annual_temp = weatherData.result.map(d => d.avg_annual_temp);
+      console.log(avg_annual_temp);
 
      // Configure a band scale for the horizontal axis
     var xBandScaleTR = d3.scaleBand()
-        .domain(d3.extent(d =>d.year))
+        .domain(d3.extent((d, i) => year[i]))
         .range([0, chartWidth])
         .paddingInner(0.1);
 
     // Create a linear scale for the vertical axis. Extent gives min and max as limits
     var yLinearScaleTR = d3.scaleLinear()
-        .domain([0, d3.max(weatherData, d => d.avg_annual_temp)])
+        .domain([0, d3.max((d, i) => avg_annual_temp[i])])
         .range([chartHeight,0]);
-    
-    //trying this other scale to allow for negative values
-    var yAxisScaleTR = d3.scaleLinear()
-      .domain([d3.min(weatherData, d => d.avg_annual_temp), d3.max(weatherData, d =>d.avg_annual_temp)])
-      .range([chartHeight - yLinearScaleTR(d3.min(weatherData, d => d.avg_annual_temp)), 0]);
 
     // These will be used to create the chart's axes
     var bottomAxisTR = d3.axisBottom(xBandScaleTR);
-    var leftAxisTR = d3.axisLeft(yAxisScaleTR);
+    var leftAxisTR = d3.axisLeft(yLinearScaleTR);
 
     // Append two SVG group elements to the chartGroup area,
     // and create the bottom and left axes inside of them
@@ -86,12 +87,12 @@ d3.json(tempRain_url).then((weatherData, err) => {
         .enter()
         .append("rect")
         .attr("class", "bar")
-        .attr("x", d => xBandScaleTR(d.year))
-        .attr("y", d => yLinearScaleTR(d.avg_annual_temp))
+        .attr("x", (d, i) => xBandScaleTR(year[i]))
+        .attr("y", (d, i) => yLinearScaleTR(d))
         .attr("width", xBandScaleTR.bandwidth())
-        .attr("height", d => chartHeight - yLinearScaleTR(d.avg_annual_temp))
-        .attr("width", xBandScaleTR.bandwidth())
-        .attr("height", d => chartHeight - yLinearScaleTR(d.avg_annual_temp))
+        .attr("height", d => chartHeight - yLinearScaleTR(d))
+
+        console.log(rectanglesGroup);
 
     // Create axes labels
     chartGroupTR.append("text")
@@ -106,11 +107,11 @@ d3.json(tempRain_url).then((weatherData, err) => {
       .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + chartMargin.top + 30})`)
       .attr("class", "axisText")
       .text("Year")
-      .selectAll("text")	
+      /*.selectAll("text")	
         .style("text-anchor", "end")
         .attr("dx", "-.8em")
         .attr("dy", ".15em")
-        .attr("transform", "rotate(65)");
+        .attr("transform", "rotate(65)");*/
 
     //Initialize Tooltip
     var toolTip = d3.tip()
