@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<h3 class="mt-4">Australia Fire API</h3>
+<h3 class="mt-4">Australian Fire API</h3>
 <p>
   The data used for this project was extracted, transformed, and loaded into a MongoDB database. This
   data is available for use through a Python Flask-powered API. For more information on the original data
@@ -42,33 +42,33 @@
     <tr>
       <th scope="row">/fires_modis_geojson</th>
       <td>Returns a GeoJSON-formatted list of fires from the 2019 - 2020 Australia fire season that were recorded by the
-        MODIS (Moderate Resolution Imaging Spectroradiometer) satellite sensor. </td>
+        MODIS satellite sensor. </td>
     </tr>
     <tr>
       <th scope="row">/fires_viirs_geojson</th>
       <td>Returns a GeoJSON-formatted list of fires from the 2019 - 2020 Australia fire season that were recorded by the
-        VIIRS (Visible Infrared Imaging Radiometer Suite) satellite sensor.</td>
+        VIIRS satellite sensor.</td>
     </tr>
     <tr></tr>
     <th scope="row">/fires_historical</th>
-    <td>Returns a list of past Australia fire seasons.</td>
+    <td>Returns a list of damage from past Australia fire seasons and major events.</td>
     </tr>
     <tr>
       <th scope="row">/fires_bystate</th>
-      <td>Returns a list of the Austrialian states and the 2019-2020 bushfire devastation.</td>
+      <td>Returns aggregated data on each state's damage sustained during the 2019-2020 bushfire season.</td>
     </tr>
     <tr>
       <th scope="row">/bushfire_season_2019</th>
-      <td>Returns additional information about the 2019-2020 Austrialian bushfire.</td>
+      <td>Returns detailed information about each fire recorded during the 2019-2020 bushfire season.</td>
     </tr>
     <tr>
       <th scope="row">/fires_time_series</th>
-      <td>Returns data to build the Australia fire time series chart to show the number of fires captured by NASA
-        satellites over time during the 2019-20 fire season.</td>
+      <td>Returns daily totals for the number of observed fires over time during the 2019-20 fire season, as captured by NASA satellites. 
+        Powers the "Number of Fires" time series chart.</td>
     </tr>
     <tr>
       <th scope="row">/aus_temp_rainfall</th>
-      <td>Returns average annual temperature and average annual rainfall data for Australia.</td>
+      <td>Returns average annual temperature and average annual rainfall data for all of Australia, from 1956-2019.</td>
     </tr>
   </tbody>
 </table>
@@ -178,9 +178,7 @@
 <h3 class="mt-5">
   Example Request
 </h3>
-<p>Here is an example of a request to get data about the Australia fires captured by NASA satellites
-  (MODIS). This
-  example uses the d3.json method to retrieve data.</p>
+<p>Here is an example of a request to retrieve data about for all fires captured by NASA MODIS satellites, using the <code>d3.json</code> method.</p>
 
 <code>
   const url = "https://australia-fire-api-dashboard.herokuapp.com/api/v1.0/fires_modis"
