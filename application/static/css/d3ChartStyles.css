@@ -3,6 +3,7 @@
   fill: #000;
   transition: fill 0.3s ease-out;
   text-anchor: middle;
+  font-size: 18px;
 }
 
 .inactive {
@@ -10,6 +11,7 @@
   fill: #c9c9c9;
   transition: fill 0.3s ease-out;
   text-anchor: middle;
+  font-size: 18px;
 }
 
 .inactive:hover {
@@ -19,7 +21,7 @@
 
 .d3-tip {
   padding: 6px;
-  font-size: 12px;
+  font-size: 16px;
   line-height: 1;
   line-height: 1.5em;
   color: #fff;
@@ -49,3 +51,13 @@
   /* Firefox 18- */
   color: #8e979f;
 }
+
+.bar {
+  fill:black;
+}
+
+.bar:hover {
+  fill: orangered;
+}
+
+
