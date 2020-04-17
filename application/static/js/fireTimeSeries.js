@@ -1,7 +1,7 @@
 // State to hold the values of the user input/select fields.
 let inputValues = {
-  time: 'All',
-  satellite: 'All',
+  // time: 'All',
+  // satellite: 'All',
   startDate: 'All',
   endDate: 'All',
 };
@@ -34,14 +34,14 @@ d3.select(".chart-filters").selectAll('.form-control').on('change', function (ev
 
 const buildTimeSeries = () => {
   const filterValues = Object.values(inputValues);
-  let time = filterValues[0];
-  let satellite = filterValues[1];
-  let startDate = filterValues[2];
-  let endDate = filterValues[3];
+  // let time = filterValues[0];
+  // let satellite = filterValues[1];
+  let startDate = filterValues[0];
+  let endDate = filterValues[1];
 
   // Build query url for retrieving data from api.
   let time_series_api_url = `${api_base_url}/fires_time_series`;
-  time_series_api_url = `${time_series_api_url}?satellite=${satellite}&time=${time}&start_date=${startDate}&end_date=${endDate}`
+  time_series_api_url = `${time_series_api_url}?start_date=${startDate}&end_date=${endDate}`
 
   // Insert div for loading state.
   d3.select(".time-series-column").append("div").attr("id", "loading-time-series")

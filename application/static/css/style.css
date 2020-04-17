@@ -25,3 +25,18 @@ body {
 }
 
 
+.donate-btn {
+  background-color: orangered;
+  border: 1px solid black;
+}
+
+.donate-btn:hover {
+  background-color: black;
+}
+
+.card-footer {
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+}
