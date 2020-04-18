@@ -334,7 +334,7 @@ def aus_temp_rainfall():
       'year': fire['Year'],
       'avg_annual_temp': fire['Avg Annual Temp'],
       'avg_annual_rainfall' : fire['Avg Annual Rainfall'],
-      'temp_difference': fire['temp_differnce'],
+      'temp_difference': fire['temp_difference'],
       'rainfall_difference': fire['rainfall_difference']
     })
 

@@ -62,3 +62,12 @@
 .avg-frp-line {
   stroke: #7AC142;
 }
+.bar {
+  fill:black;
+}
+
+.bar:hover {
+  fill: orangered;
+}
+
+
