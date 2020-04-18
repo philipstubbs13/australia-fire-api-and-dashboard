@@ -1,24 +1,27 @@
 {% extends 'layout.html' %} {% block body %}
 <div class="alert alert-primary" role="alert">
   <p>Australia is recovering from one of the worst wildfire seasons in its country's history, causing koalas and other
-  animals to lose their homes.</p>
+    animals to lose their homes.</p>
   <p>Help support the fire relief effort and adopt a koala today.</p>
 
-  <a type="button" href="https://donate.wwf.org.au/adopt/koala?t=AD1920O01&f=41140-227&gclid=Cj0KCQjw4dr0BRCxARIsAKUNjWTw2wIIlL23P46QBlUk8jLKj6MY2bD9pJTKfa4DKg9OPCyJBP9i75MaArtKEALw_wcB#gs.3iugyy" target="_blank" class="btn btn-primary donate-btn">Donate</a>
+  <a type="button"
+    href="https://donate.wwf.org.au/adopt/koala?t=AD1920O01&f=41140-227&gclid=Cj0KCQjw4dr0BRCxARIsAKUNjWTw2wIIlL23P46QBlUk8jLKj6MY2bD9pJTKfa4DKg9OPCyJBP9i75MaArtKEALw_wcB#gs.3iugyy"
+    target="_blank" class="btn btn-primary donate-btn">Donate</a>
 </div>
 <div class="row">
   <div class="col-md-8 col-xs-12 col-sm-12 mt-3">
     <div class="card mt-3">
       <div class="card-body">
-        <h3>Visualizing Australian Bushfires</h3>
-        <hr/>
+        <h3>Visualizing Australia Fires</h3>
+        <hr />
         <h5 class="mt-4">About</h5>
         <p>
-          This project explores how wildfires (known in Australia as "bushfires") have affected 
-          Australia over time. For this project, we gathered data captured by NASA satellites, as well as various 
-          historical wildfire and climate data. We visualized the damage and loss that Australia 
-          has sustained historically, including during the most recent (2019-2020) bushfire season, 
-          and show how climate temperature and precipitation changes are affecting the country. 
+          This project explores how wildfires (known in Australia as "bushfires") have affected
+          Australia over time. Specifically, for this project, we gathered data captured by NASA satellites and various
+          historical wildfire and climate data to help visualize what Australia not only has been through historically
+          but also what Australia has gone through with the most recent (2019-2020) wildfire season. We visualized the
+          damage and loss that Australia has sustained historically, including during the most recent (2019-2020)
+          bushfire season and show how climate temperature and precipitation changes are affecting the country.
         </p>
         <div class="row">
           <div class="col-md-4">
@@ -45,7 +48,7 @@
     <div class="card mt-3">
       <div class="card-body">
         <h5 class="card-title">Visualizations</h5>
-        <p class="card-text">Explore the history of Autralian bushfires and the impact they have had on Australia
+        <p class="card-text">Explore the history of Autralia fires and the impact they have had on Australia
           through interactive D3 visualizations.</p>
         <a type="button" href="/charts" class="btn btn-dark mt-2">View Visualizations</a>
       </div>
@@ -53,7 +56,8 @@
     <div class="card mt-3">
       <div class="card-body">
         <h5 class="card-title">API</h5>
-        <p class="card-text">Access historical, satellite, and climate data related to Australian wildfires through an Open
+        <p class="card-text">Access historical, satellite, and climate data related to Australian wildfires through an
+          Open
           Python Flask REST API. </p>
         <a type="button" href="/api/v1.0/docs" class="btn btn-dark mt-2">Explore API</a>
       </div>
