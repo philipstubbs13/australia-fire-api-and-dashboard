@@ -1,6 +1,6 @@
 {% extends 'layout.html' %} {% block body %}
 {% include 'includes/_historicalComparisonChart.html' %}
-<div className="row">
+<div className="row" data-aos="fade-down-right" data-aos-duration="2000">
   <div className="col-xs-12 col-md-6 d-flex justify-content-center mt-5 text-center">
     <h4 class="mt-5 text-center">Bushfire Devastation by State (2019 - 2020)</h4>
     <div id="bushfire-devastation-chart"></div>
@@ -8,4 +8,5 @@
 </div>
 {% include 'includes/_fireTimeSeries.html' %}
 {% include 'includes/_tempRainChart.html' %}
+<!-- {% include 'includes/_firePower.html' %} -->
 {% endblock %}

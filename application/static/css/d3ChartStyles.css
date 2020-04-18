@@ -50,6 +50,18 @@
   color: #8e979f;
 }
 
+.line {
+  fill: none;
+  stroke-width: 2px;
+}
+
+.avg-brightness-line {
+  stroke: orangered;
+}
+
+.avg-frp-line {
+  stroke: #7AC142;
+}
 .bar {
   fill:black;
 }
