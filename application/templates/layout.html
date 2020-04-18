@@ -12,6 +12,7 @@
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css')}}" />
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/d3ChartStyles.css')}}" />
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/d3_timeseries.min.css')}}" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 
   <title>Visualizing Australia Fires</title>
 </head>
@@ -41,14 +42,18 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
     integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
     crossorigin="anonymous"></script>
-  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  <!-- <script src="{{ url_for('static', filename='js/app.js') }}"></script> -->
   <script src="{{ url_for('static', filename='js/historicalComparisonChart.js') }}"></script>
   <script src="{{ url_for('static', filename='js/fireTimeSeries.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/firePowerChart.js') }}"></script>
+  <!-- <script src="{{ url_for('static', filename='js/firePowerChart.js') }}"></script> -->
   <script src="{{ url_for('static', filename='js/buildDataTable.js') }}"></script>
   <script src="{{ url_for('static', filename='js/currentSeasonDevastationChart.js') }}"></script>
   <script src="{{ url_for('static', filename='js/tempRainChart.js') }}"></script>
   <script src="{{ url_for('static', filename='js/saveSvgAsPng.js') }}"></script>
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    AOS.init();
+  </script>
   </script>
 
 </body>
