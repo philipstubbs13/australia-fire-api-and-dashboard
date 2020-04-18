@@ -63,8 +63,8 @@
     </tr>
     <tr>
       <th scope="row">/fires_time_series</th>
-      <td>Returns daily totals for the number of observed fires over time during the 2019-20 fire season, as captured by NASA satellites. 
-        Powers the "Number of Fires" time series chart.</td>
+      <td>Returns data to build the Australia fire time series chart to show the number of fires captured by NASA
+        satellites over time during the 2019-20 fire season.</td>
     </tr>
     <tr>
       <th scope="row">/aus_temp_rainfall</th>
@@ -134,6 +134,9 @@
             <li>
               <code>/fires_viirs_geojson</code>
             </li>
+            <li>
+              <code>/fires_time_series</code>
+            </li>
           </ul>
         </p>
       </td>
@@ -164,6 +167,9 @@
             <li>
               <code>/fires_viirs_geojson</code>
             </li>
+            <li>
+              <code>/fires_time_series</code>
+            </li>
           </ul>
         </p>
       </td>
@@ -178,7 +184,8 @@
 <h3 class="mt-5">
   Example Request
 </h3>
-<p>Here is an example of a request to retrieve data about for all fires captured by NASA MODIS satellites, using the <code>d3.json</code> method.</p>
+<p>Here is an example of how to make a request to the API to get data about Australia fires that were captured by NASA
+  MODIS satellites. Note that this example uses the d3.json method.</p>
 
 <code>
   const url = "https://australia-fire-api-dashboard.herokuapp.com/api/v1.0/fires_modis"
