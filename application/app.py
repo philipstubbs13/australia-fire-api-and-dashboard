@@ -381,6 +381,8 @@ def fires_time_series():
       'id': str(fire['_id']),
       'x': fire['acq_date'],
       'y': fire['number_fires'],
+      'avg_frp': fire['avg_frp'],
+      'avg_brightness': fire['avg_brightness']
     })
 
   # Create a list of just the dates.
