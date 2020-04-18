@@ -98,7 +98,7 @@ d3.json(frp_time_series_url).then(function (data) {
     .attr("font-size", "16px")
     .attr("font-weight", "bold")
     .attr("fill", "#7AC142")
-    .text("Average Intensity (or FRP - Fire Radiative Power)");
+    .text("Average Intensity in MW (megawatts) (or FRP - Fire Radiative Power)");
 
   frpChartGroup.append("text")
     .attr("transform", `translate(${frpWidth / 2}, ${frpHeight + frpMargin.top + 55})`)
