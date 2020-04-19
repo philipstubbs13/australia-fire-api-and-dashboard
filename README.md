@@ -4,7 +4,7 @@
 
 This project explores how wildfires have affected Australia over time through data visualizations, including interactive time series charts, plots and a map. Visit our [website](https://australia-fire-api-dashboard.herokuapp.com/) to learn more.
 
-For this project, we collected open data from a number of sources, including data captured by NASA satellites and various wildfire and climate data. 
+For this project, we collected open data from a number of sources, including data captured by NASA satellites and various wildfire and climate data. More information about our sources and the data itself can be found in the [Data page](./docs/data.md) in the `docs` folder.
 
 Following, we'll share a background of the project and explain how to recreate the webapp locally, using the code and data shared in this repo.
 
