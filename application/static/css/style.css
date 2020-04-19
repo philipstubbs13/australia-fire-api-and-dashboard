@@ -2,6 +2,10 @@
   color: #fff !important;
 }
 
+.navbar {
+  border-bottom: 3px solid orangered;
+}
+
 a:hover {
   color: orangered !important;
 }
@@ -24,7 +28,6 @@ body {
   flex: 1;
 }
 
-
 .orange-btn {
   background-color: orangered;
   border: 1px solid black;
@@ -34,9 +37,24 @@ body {
   background-color: black;
 }
 
+.home-card {
+  border: 1px solid black;
+}
+
 .card-footer {
   left: 0;
   bottom: 0;
   width: 100%;
   text-align: center;
+  border-top: 3px solid orangered;
 }
+
+/* Menu Button */
+.github-side-icon {
+	position: absolute;
+	z-index: 3;
+  top: 100px;
+	right: 35px;
+	cursor: pointer;
+}
+

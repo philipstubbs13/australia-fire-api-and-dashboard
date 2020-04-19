@@ -20,6 +20,9 @@
 <body>
 
   {% include 'includes/_navbar.html' %}
+  <a href="https://github.com/philipstubbs13/australia-fire-api-and-dashboard" target="_blank">
+    <i class="fab fa-github fa-3x github-side-icon"></i>
+  </a>
   <div class="container">
     {% block body %}{% endblock %}
   </div>
@@ -45,7 +48,7 @@
   <!-- <script src="{{ url_for('static', filename='js/app.js') }}"></script> -->
   <script src="{{ url_for('static', filename='js/historicalComparisonChart.js') }}"></script>
   <script src="{{ url_for('static', filename='js/fireTimeSeries.js') }}"></script>
-  <!-- <script src="{{ url_for('static', filename='js/firePowerChart.js') }}"></script> -->
+  <script src="{{ url_for('static', filename='js/firePowerChart.js') }}"></script>
   <script src="{{ url_for('static', filename='js/buildDataTable.js') }}"></script>
   <script src="{{ url_for('static', filename='js/currentSeasonDevastationChart.js') }}"></script>
   <script src="{{ url_for('static', filename='js/tempRainChart.js') }}"></script>
