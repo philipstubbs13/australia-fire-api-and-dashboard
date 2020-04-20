@@ -13,7 +13,7 @@ This README includes background information about the project and steps on how t
 #### Backend
 
 - [Flask](https://flask.palletsprojects.com/en/1.1.x/), a Python micro web framework used to run the application.
-- [MongoDB](https://www.mongodb.com/), a NoSQL for storing the data locally.
+- [MongoDB](https://www.mongodb.com/), a NoSQL database for storing the data locally.
 - [MongoDB Atlas](https://www.mongodb.com/cloud/atlas), for storing the data in the cloud.
 - [Heroku](https://www.heroku.com/), for running the dashboard in the cloud.
 - [Jupyter Notebook](https://jupyter.readthedocs.io/en/latest/running.html), for running Python code within a larger document.
