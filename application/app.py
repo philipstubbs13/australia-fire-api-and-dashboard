@@ -385,6 +385,9 @@ def fires_time_series():
       'avg_brightness': fire['avg_brightness']
     })
 
+  # Sort data by acq_date (ascending)
+  sorted_output = sorted(output, key=lambda k: k['x']) 
+
   # Create a list of just the dates.
   # dates = []
   # for fire in output:
@@ -405,7 +408,7 @@ def fires_time_series():
   # for key, value in freq.items():
   #   freq_list.append({ 'x': key, 'y': value })
 
-  return jsonify({'result' : output })
+  return jsonify({'result' : sorted_output })
 
 if __name__ == "__main__":
     app.run()
